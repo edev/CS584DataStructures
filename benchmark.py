@@ -1,6 +1,7 @@
 import timeit
 import random
 import sys
+import statistics
 from binarysearchtree import BinarySearchTree
 
 
@@ -78,7 +79,7 @@ def plotBenchmarks(
         stop,
         benchmark_start,
         benchmark_length,
-        benchmark_interval
+        benchmark_interval,
 ):
     """Returns a Plot containing the results of a full suite of benchmarks.
 
@@ -142,24 +143,103 @@ def plotBenchmarks(
 
     return plot
 
-START = 0
-BM_START = 10000
-BM_LENGTH = 1000
-BM_INTERVAL = BM_START
-STOP = BM_START * 10 + BM_LENGTH
+def plotBenchmarksMultipass(
+        function,
+        samples,
+        start,
+        stop,
+        benchmark_start,
+        benchmark_length,
+        benchmark_interval,
+        combine_method=statistics.mean
+):
+    """Calls plotBenchmarks on multiple samples, then combines data points to form a single plot.
 
-bst = BinarySearchTree()
-inputs = generateInput(STOP - START)
-plot = plotBenchmarks(
-    function=lambda x: bst.insert(x),
-    samples=inputs,
-    start=START,
-    stop=STOP,
-    benchmark_start=BM_START,
-    benchmark_length=BM_LENGTH,
-    benchmark_interval=BM_INTERVAL
-)
-print(plot.coordinates)
+    samples: a list of sample lists, where each sample list will be passed into plotBenchmarks as sample.
+    combine_method: "median" or "average".
+
+    After running each sample list through plotBenchmarks, plotBenchmarksMultiplass will create a list of y-values
+    for each x-value (e.g. [1.10003, 1.1405, 0.981] for some x-value if samples has 3 sample sets) and produce a
+    final y-value for that x-value by calling combine_method on that list. The statistics package has good, common
+    choices like mean and various medians.
+
+    Finally, it will return one plot containing all such resulting coordinates."""
+
+    if not isinstance(samples[0], list):
+        raise TypeError("samples must be a list of lists.")
+
+    plots = [Plot()] * len(samples)
+
+    for i in range(len(samples)):
+        plots[i] = plotBenchmarks(
+            function,
+            samples[i],
+            start,
+            stop,
+            benchmark_start,
+            benchmark_length,
+            benchmark_interval
+        )
+
+    final_plot = Plot()
+    num_pluts = len(plots)
+    for j in range(len(plots[0].coordinates)):
+        yvalues = [0] * num_pluts
+        for i in range(num_pluts):
+            yvalues[i] = plots[i].coordinates[j][1]
+        final_plot.plotPoint(plots[0].coordinates[j][0], combine_method(yvalues))
+
+    # PURELY FOR TESTING
+    for i in range(len(plots)):
+        print(plots[i].coordinates)
+    return final_plot
+
+
+def doPlotBenchmarks():
+    START = 0
+    BM_START = 10000
+    BM_LENGTH = 1000
+    BM_INTERVAL = BM_START
+    STOP = BM_START * 10 + BM_LENGTH
+
+    bst = BinarySearchTree()
+    inputs = generateInput(STOP - START)
+    plot = plotBenchmarks(
+        function=lambda x: bst.insert(x),
+        samples=inputs,
+        start=START,
+        stop=STOP,
+        benchmark_start=BM_START,
+        benchmark_length=BM_LENGTH,
+        benchmark_interval=BM_INTERVAL
+    )
+    print(plot.coordinates)
+
+
+def doPlotBenchmarksMultipass():
+    START = 0
+    BM_START = 10000
+    BM_LENGTH = 1000
+    BM_INTERVAL = BM_START
+    STOP = BM_START * 10 + BM_LENGTH
+    PASSES = 3
+
+    bst = BinarySearchTree()
+    inputs = [0] * PASSES
+    for i in range(PASSES):
+        inputs[i] = generateInput(STOP - START)
+    plot = plotBenchmarksMultipass(
+        function=lambda x: bst.insert(x),
+        samples=inputs,
+        start=START,
+        stop=STOP,
+        benchmark_start=BM_START,
+        benchmark_length=BM_LENGTH,
+        benchmark_interval=BM_INTERVAL
+    )
+    print(plot.coordinates)
+
+doPlotBenchmarksMultipass()
 
 # for i in range(0, TIMES):
 #     print(timeit.timeit(lambda: insert(bst, inputs, SAMPLES*i, SAMPLES*(i+1)), number=1))

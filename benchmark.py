@@ -151,7 +151,7 @@ def plotBenchmarksMultipass(
         benchmark_start,
         benchmark_length,
         benchmark_interval,
-        combine_method=statistics.mean
+        combine_method=statistics.median
 ):
     """Calls plotBenchmarks on multiple samples, then combines data points to form a single plot.
 
@@ -193,6 +193,32 @@ def plotBenchmarksMultipass(
     for i in range(len(plots)):
         print(plots[i].coordinates)
     return final_plot
+
+
+def plotBenchmark3(
+        function,
+        samples,
+        start,
+        stop,
+        benchmark_start,
+        benchmark_length,
+        benchmark_interval,
+        combine_method=statistics.median
+):
+    """Wrapper around plotBenchmarkMultipass to make it easier to run the same sample 3 times.
+
+    Duplicates the sample list 3 times and passes it into plotBenchmarkMultipass, returning the result."""
+    
+    return plotBenchmarksMultipass(
+        function,
+        samples * 3,
+        start,
+        stop,
+        benchmark_start,
+        benchmark_length,
+        benchmark_interval,
+        combine_method
+    )
 
 
 def doPlotBenchmarks():

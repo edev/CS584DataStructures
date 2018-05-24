@@ -3,6 +3,7 @@ import random
 import sys
 import statistics
 from binarysearchtree import BinarySearchTree
+import trender
 
 
 class PgfPlot:
@@ -19,26 +20,43 @@ class PgfPlot:
             ylabel="",
             title="",
             caption="",
+            template = "figure.template.tex"
     ):
         """Initializes all options of a BenchmarkGraph:
 
-        inputSet: the data to be used in the benchmarks, in the order in which they should be used.
         xlabel: the x-axis label, e.g. \begin{axis}[xlabel={foo}]
         ylabel: the y-axis label, e.g. \begin{axis}[xlabel={foo}]
         title: the graph title, e.g. \begin{axis}[title={foo}]
-        caption: the figure caption, e.g. \caption{foo}"""
+        caption: the figure caption, e.g. \caption{foo}
+        template: the name of the template file to use."""
+
         self.xlabel = xlabel
         self.ylabel = ylabel
         self.title = title
         self.caption = caption
         self.plots = []
 
+        with open(template, 'r') as f:
+            self.template = trender.TRender(f.read())
+
     def addPlot(self, plot):
         """Adds plot to the graph."""
         self.plots.append(plot)
 
-    # TODO Write generate method.
+    def write(self, filename):
+        """Writes the LaTeX Figure object to the specified file.
 
+        filename: the filename to use when writing the results to disk."""
+
+        output = self.template.render({
+            "xlabel": self.xlabel,
+            "ylabel": self.ylabel,
+            "title": self.title,
+            "caption": self.caption,
+        })
+
+        with open(filename, "w") as f:
+            f.write(output)
 
 class Plot:
     """Represents one Plot, e.g. one line, curve, etc., of a LaTeX PgfPlots graph."""
@@ -143,6 +161,7 @@ def plotBenchmarks(
 
     return plot
 
+
 def plotBenchmarksMultipass(
         function,
         samples,
@@ -208,7 +227,7 @@ def plotBenchmark3(
     """Wrapper around plotBenchmarkMultipass to make it easier to run the same sample 3 times.
 
     Duplicates the sample list 3 times and passes it into plotBenchmarkMultipass, returning the result."""
-    
+
     return plotBenchmarksMultipass(
         function,
         samples * 3,
@@ -265,7 +284,16 @@ def doPlotBenchmarksMultipass():
     )
     print(plot.coordinates)
 
-doPlotBenchmarksMultipass()
 
 # for i in range(0, TIMES):
 #     print(timeit.timeit(lambda: insert(bst, inputs, SAMPLES*i, SAMPLES*(i+1)), number=1))
+
+# doPlotBenchmarksMultipass()
+
+testplot = PgfPlot(
+    xlabel="TEST X LABEL",
+    ylabel="TEST Y LABEL",
+    title="TEST TITLE",
+    caption="TEST CAPTION"
+)
+testplot.write("plots/testplot.tex")

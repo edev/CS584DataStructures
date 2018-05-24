@@ -1,0 +1,35 @@
+\begin{figure}[h]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            xlabel={@xlabel},
+            ylabel={@ylabel},
+            title={@title}
+        ]
+        \addplot coordinates {
+            (5, 6)
+            (17, 18)
+            (49, 50)
+            (129, 130)
+            (321, 322)
+            (769, 770)
+            (1793, 1794)
+            (4097, 4098)
+            (9217, 9218)
+        };
+        \addplot coordinates {
+            (5, 16)
+            (17, 118)
+            (49, 150)
+            (129, 1130)
+            (321, 1322)
+            (769, 1770)
+            (1793, 11794)
+            (4097, 14098)
+            (9217, 19218)
+        };
+        \legend{Plot 1, Plot 2}
+        \end{axis}
+    \end{tikzpicture}
+    \caption{@caption}
+\end{figure}

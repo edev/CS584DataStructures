@@ -364,14 +364,19 @@ def testWriteBenchmark():
 
 # doPlotBenchmarksMultipass()
 
-print("testWriteBenchmark started at: " + time.asctime(time.localtime(time.time())))
-testWriteBenchmark()
-print("Completed at: " + time.asctime(time.localtime(time.time())) + ". Starting raw insertion.")
+# print("testWriteBenchmark started at: " + time.asctime(time.localtime(time.time())))
+# testWriteBenchmark()
+# print("Completed at: " + time.asctime(time.localtime(time.time())) + ". Starting raw insertion.")
 
-inputs = [0] * 3
-for i in range(3):
-    inputs[i] = generateInput(101000)
-for i in range(3):
-    bst = BinarySearchTree()
-    for j in range(len(inputs)):
-        bst.insert(inputs[j])
+# inputs = [[]] * 3
+# for i in range(3):
+#     inputs[i] = generateInput(101000)
+
+# for i in range(3):
+# bst = BinarySearchTree()
+# plotBenchmarksMultipass(bst.insert, inputs, 0, len(inputs[i]), 1000, 1000, 1000) # 3-pass benchmarks, again, fast.
+    # print("BST insertion (set {}) started at {}".format(i+1, time.asctime(time.localtime(time.time()))))
+    # plotBenchmarks(bst.insert, inputs[i], 0, len(inputs[i]), 1000, 1000, 1000) # Series of benchmarks - runs fairly fast
+    # benchmark(bst.insert, inputs[i], 0, len(inputs[i])) # Single benchmark - runs fast.
+    # for j in range(len(inputs[i])):
+        # bst.insert(inputs[i][j]) # Raw insertion - runs fast.

@@ -4,6 +4,7 @@ import sys
 import statistics
 from binarysearchtree import BinarySearchTree
 import trender
+import time
 
 
 class PgfPlot:
@@ -48,13 +49,23 @@ class PgfPlot:
 
         filename: the filename to use when writing the results to disk."""
 
+        # First, prepare the plots.
+        plots = ""
+        for plot in self.plots:
+            plots += plot.generate()
+        # Then, strip off the final "\n".
+        plots = plots[0:-2]
+
+        # Next, render the template.
         output = self.template.render({
             "xlabel": self.xlabel,
             "ylabel": self.ylabel,
             "title": self.title,
             "caption": self.caption,
+            "plots": plots
         })
 
+        # Finally, write the file.
         with open(filename, "w") as f:
             f.write(output)
 
@@ -68,11 +79,22 @@ class Plot:
         """Records (x, y) as a point on the plot."""
         self.coordinates.append((x, y))
 
-    # TODO Write generate method
+    def generate(self, base_indentation=2) -> str:
+        """Returns a LaTeX string representation of the Plot, in the form of an addplot object.
+
+        base_inedntation: the number of tabs to insert before the addplot tag.
+            Subsequent lines will be indented appropriately."""
+        tabs = "\t" * (base_indentation + 1)
+        output = "\t" * base_indentation + "\\addplot coordinates {\n"
+        for (x, y) in self.coordinates:
+            output += tabs + "({}, {})\n".format(x, y)
+        output += "\t" * base_indentation + "};\n"
+        return output
 
 
 def benchmark(function, samples, start, stop):
     """Returns the total time used by calling function(x) on every x in sample with indices in range(start, stop)."""
+    print("Starting benchmark on sample range: [{}, {})".format(start, stop))
     return timeit.timeit(stmt=lambda: _benchmarkRun(function, samples, start, stop), number=1)
 
 
@@ -84,6 +106,8 @@ def _benchmarkRun(function, samples, start, stop):
 
 def generateInput(n, min=0, max=sys.maxsize):
     """Returns an n-sized array and populates it with random values in the range of [min, max]."""
+
+    print("Generating random array of size {}".format(n))
     array = [0] * n
     for i in range(n):
         array[i] = random.randrange(min, max+1)
@@ -285,15 +309,69 @@ def doPlotBenchmarksMultipass():
     print(plot.coordinates)
 
 
+def testPfgPlot():
+    testpfgplot = PgfPlot(
+        xlabel="TEST X LABEL",
+        ylabel="TEST Y LABEL",
+        title="TEST TITLE",
+        caption="TEST CAPTION"
+    )
+    testplot = Plot()
+    testplot.plotPoint(1, 2)
+    testplot.plotPoint(3, 4)
+    testplot.plotPoint(5, 6)
+    testpfgplot.addPlot(testplot)
+    testplot2 = Plot()
+    testpfgplot.addPlot(testplot2)
+    testplot2.plotPoint(1, 5)
+    testplot2.plotPoint(2, 6)
+    testplot2.plotPoint(3, 7)
+    testplot2.plotPoint(4, 8)
+    testplot2.plotPoint(5, 9)
+    testpfgplot.write("plots/testpfgplot.tex")
+
+
+def testWriteBenchmark():
+    START = 0
+    BM_START = 10000
+    BM_LENGTH = 1000
+    BM_INTERVAL = BM_START
+    STOP = BM_START * 10 + BM_LENGTH
+    PASSES = 3
+
+    bst = BinarySearchTree()
+    inputs = [0] * PASSES
+    for i in range(PASSES):
+        inputs[i] = generateInput(STOP - START)
+    plot = plotBenchmarksMultipass(
+        function=lambda x: bst.insert(x),
+        samples=inputs,
+        start=START,
+        stop=STOP,
+        benchmark_start=BM_START,
+        benchmark_length=BM_LENGTH,
+        benchmark_interval=BM_INTERVAL
+    )
+    figure = PgfPlot("Data structure size",
+                     "Elapsed time (seconds)",
+                     "BST on Randomized Input",
+                     "Binary Search Tree - Randomized Input Set, 3 Passes")
+    figure.write("plots/testWriteBenchmark.tex")
+
+
 # for i in range(0, TIMES):
 #     print(timeit.timeit(lambda: insert(bst, inputs, SAMPLES*i, SAMPLES*(i+1)), number=1))
 
 # doPlotBenchmarksMultipass()
 
-testplot = PgfPlot(
-    xlabel="TEST X LABEL",
-    ylabel="TEST Y LABEL",
-    title="TEST TITLE",
-    caption="TEST CAPTION"
-)
-testplot.write("plots/testplot.tex")
+print("testWriteBenchmark started at: " + time.asctime(time.localtime(time.time())))
+testWriteBenchmark()
+print("Completed at: " + time.asctime(time.localtime(time.time())) + ". Starting raw insertion.")
+
+inputs = [0] * 3
+for i in range(3):
+    inputs[i] = generateInput(101000)
+for i in range(3):
+    bst = BinarySearchTree()
+    for j in range(len(inputs)):
+        bst.insert(inputs[j])

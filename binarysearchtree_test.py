@@ -1,5 +1,5 @@
 import unittest
-from binarysearchtree import BinarySearchTree
+from datastructures.binarysearchtree import BinarySearchTree
 import random
 
 

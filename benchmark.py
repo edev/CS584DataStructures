@@ -1,7 +1,7 @@
 import random
 import sys
 import statistics
-from binarysearchtree import BinarySearchTree
+from datastructures.binarysearchtree import BinarySearchTree
 from pgfplot import PgfPlot
 
 

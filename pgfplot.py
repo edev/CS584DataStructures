@@ -98,7 +98,7 @@ class PgfPlot:
         for plot in self.plots:
             plots += plot.get_latex()
         # Then, strip off the final "\n".
-        plots = plots[0:-2]
+        plots = plots[0:-1]
 
         # Next, render the template.
         output = self.template.render({

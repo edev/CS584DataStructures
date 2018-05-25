@@ -32,8 +32,24 @@ In order to compensate for larger variations in system load and running time, ea
 
 Having addressed the major issues of unpredictable CPU-time fluctuations, a problem of predictable CPU-time fluctuations remains: the type of test data chosen can affect the integrity of the tests themselves. Strings as keys, of course, are poor choices, since they take linear time to compare (at least using simple string comparison). Objects with numeric keys might simulate real-world conditions well (as might strings), but they, too, may add a degree of instability to the test results, even given that Python passes references to objects. The simplest choice, with the highest likelihood of consistent performance, seems to be simple integers (within the limit of an architecture's word size). Near-constant-time integer comparisons and assignments should minimize the data themselves as sources of noise in the benchmarks to follow.
 
+\todo{Shorten the above paragraphs}
+
+\section{Project Files}
+The Python 3 implementations included with this report are structured as follows:
+\begin{itemize}
+    \item datastructures/ --- contains the implementations of data structures benchmarked below, one per file.
+    \item plots/ --- contains the output \LaTeX \ figures that the benchmark system produces, ready to \\include.
+    \item pgfplot.py --- contains the PgfPlot class, which represents one \LaTeX \ figure to be produced. This class receives and stores all parameters that affect the figure, including plots to be produced.
+    \item plot.py --- contains the Plot and BenchmarkPlot classes, which represent plots in a PGFPLOT graph. The Plot class may be used to produce arbitrary plots, whereas the BenchmarkPlot class receives benchmark parameters for one function and produces the corresponding plot.
+    \item benchmark.py --- sets up and runs the benchmarks used in this document by creating PgfPlot objects and running them.
+\end{itemize}
+
+To run custom benchmarks, simply follow the examples in benchmark.py. All classes are thoroughly documented and commented.
+
 \section{Data Structure Selection}
 Many implementations exist for each of these data structures, since they are well-known. 
+
+\todo{Charts here comparing different implementations of various data structures}
 
 \newpage
 \section{Testing TikZ Pictures}

@@ -32,8 +32,16 @@ In order to compensate for larger variations in system load and running time, ea
 
 Having addressed the major issues of unpredictable CPU-time fluctuations, a problem of predictable CPU-time fluctuations remains: the type of test data chosen can affect the integrity of the tests themselves. Strings as keys, of course, are poor choices, since they take linear time to compare (at least using simple string comparison). Objects with numeric keys might simulate real-world conditions well (as might strings), but they, too, may add a degree of instability to the test results, even given that Python passes references to objects. The simplest choice, with the highest likelihood of consistent performance, seems to be simple integers (within the limit of an architecture's word size). Near-constant-time integer comparisons and assignments should minimize the data themselves as sources of noise in the benchmarks to follow.
 
+\todo{Shorten the above paragraphs}
+
+\section{Project Files}
+\todo{Brief, itemized/bullet point outline of what files are what.}
+\todo{Move data structures into their own folder.}
+
 \section{Data Structure Selection}
 Many implementations exist for each of these data structures, since they are well-known. 
+
+\todo{Charts here comparing different implementations of various data structures}
 
 \newpage
 \section{Testing TikZ Pictures}

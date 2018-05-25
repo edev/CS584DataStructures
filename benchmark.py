@@ -1,9 +1,8 @@
 import random
 import sys
+import statistics
 from binarysearchtree import BinarySearchTree
-
 from pgfplot import PgfPlot
-from plot import Plot, plotBenchmarksMultipass
 
 
 def generateInput(n, min=0, max=sys.maxsize):
@@ -17,53 +16,68 @@ def generateInput(n, min=0, max=sys.maxsize):
 
 
 def testPfgPlot():
-    testpfgplot = PgfPlot(
-        xlabel="TEST X LABEL",
-        ylabel="TEST Y LABEL",
-        title="TEST TITLE",
-        caption="TEST CAPTION"
-    )
-    testplot = Plot()
-    testplot.plotPoint(1, 2)
-    testplot.plotPoint(3, 4)
-    testplot.plotPoint(5, 6)
-    testpfgplot.addPlot(testplot)
-    testplot2 = Plot()
-    testpfgplot.addPlot(testplot2)
-    testplot2.plotPoint(1, 5)
-    testplot2.plotPoint(2, 6)
-    testplot2.plotPoint(3, 7)
-    testplot2.plotPoint(4, 8)
-    testplot2.plotPoint(5, 9)
-    testpfgplot.write("plots/testpfgplot.tex")
+    # Create data structures
+    bst = BinarySearchTree()
+    mylist = []
 
-
-def testWriteBenchmark():
+    # Create samples
     START = 0
     BM_START = 10000
     BM_LENGTH = 1000
     BM_INTERVAL = BM_START
     STOP = BM_START * 10 + BM_LENGTH
     PASSES = 3
+    inputs = generateInput(STOP - START)
 
-    bst = BinarySearchTree()
-    inputs = [0] * PASSES
-    for i in range(PASSES):
-        inputs[i] = generateInput(STOP - START)
-    plot = plotBenchmarksMultipass(
-        function=lambda x: bst.insert(x),
+    testpgfplot = PgfPlot(
+        filename="plots/testpgfplot.tex",
+        functions=[bst.insert, mylist.append],
         samples=inputs,
-        start=START,
-        stop=STOP,
-        benchmark_start=BM_START,
-        benchmark_length=BM_LENGTH,
-        benchmark_interval=BM_INTERVAL
+        startindex=START,
+        stopindex=STOP,
+        bm_startindex=BM_START,
+        bm_length=BM_LENGTH,
+        bm_interval=BM_INTERVAL,
+        repeat=PASSES,
+        combine_method=statistics.median,
+        xlabel="TEST X LABEL",
+        ylabel="TEST Y LABEL",
+        title="TEST TITLE",
+        caption="TEST CAPTION"
     )
-    figure = PgfPlot("Data structure size",
-                     "Elapsed time (seconds)",
-                     "BST on Randomized Input",
-                     "Binary Search Tree - Randomized Input Set, 3 Passes")
-    figure.write("plots/testWriteBenchmark.tex")
+
+    # Do the benchmark
+    testpgfplot.run()
+
+
+testPfgPlot()
+
+# def testWriteBenchmark():
+#     START = 0
+#     BM_START = 10000
+#     BM_LENGTH = 1000
+#     BM_INTERVAL = BM_START
+#     STOP = BM_START * 10 + BM_LENGTH
+#     PASSES = 3
+#
+#     bst = BinarySearchTree()
+#     inputs = [0] * PASSES
+#     for i in range(PASSES):
+#         inputs[i] = generateInput(STOP - START)
+#     plot = plotBenchmarksMultipass(
+#         function=lambda x: bst.insert(x),
+#         samples=inputs,
+#         start=START,
+#         stop=STOP,
+#         benchmark_start=BM_START,
+#         benchmark_length=BM_LENGTH,
+#         benchmark_interval=BM_INTERVAL
+#     )
+#     figure = PgfPlot("Data structure size",
+#                      "Elapsed time (seconds)",
+#                      "BST on Randomized Input",
+#                      "Binary Search Tree - Randomized Input Set, 3 Passes")
+#     figure.write("plots/testWriteBenchmark.tex")
 
 
 # for i in range(0, TIMES):
@@ -72,7 +86,7 @@ def testWriteBenchmark():
 # doPlotBenchmarksMultipass()
 
 # print("testWriteBenchmark started at: " + time.asctime(time.localtime(time.time())))
-testWriteBenchmark()
+# testWriteBenchmark()
 # print("Completed at: " + time.asctime(time.localtime(time.time())) + ". Starting raw insertion.")
 
 # inputs = [[]] * 3

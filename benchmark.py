@@ -2,6 +2,7 @@ import random
 import sys
 import statistics
 from datastructures.binarysearchtree import BinarySearchTree
+from datastructures.pyskip import Skiplist as PySkip
 from pgfplot import PgfPlot
 
 # Constants defining benchmark behavior. See BenchmarkPlot in plot.py for details.
@@ -13,8 +14,15 @@ STOP = BENCHMARK_START * 10 + BENCHMARK_LENGTH
 REPEAT = 1
 COMBINE_METHOD = statistics.median
 
+# Convenience constant for generating samples of the same size as the benchmark
+SAMPLE_SIZE = STOP - START
 
-def generateRandomSamples(n, min=0, max=sys.maxsize):
+# Constants determining default graph labels. Override in the call to graph() if desired.
+XLABEL = "Numer of items in data structure"
+YLABEL = "Running time (second)"
+
+
+def generateRandomSamples(n=SAMPLE_SIZE, min=0, max=sys.maxsize):
     """Returns an n-sized array populated with random values in the range of [min, max]."""
 
     print("Generating random array of size {}".format(n))
@@ -24,7 +32,20 @@ def generateRandomSamples(n, min=0, max=sys.maxsize):
     return array
 
 
-def graph(filename, functions, samples, xlabel="", ylabel="", title="", caption=""):
+def graph(
+        filename,
+        functions,
+        samples,
+        startindex=START,
+        stopindex=STOP,
+        bm_startindex=BENCHMARK_START,
+        bm_length=BENCHMARK_LENGTH,
+        bm_interval=BENCHMARK_INTERVAL,
+        repeat=REPEAT,
+        xlabel=XLABEL,
+        ylabel=YLABEL,
+        title=""
+):
     """Creates and runs a PgfPlot sequence with the given settings, using the benchmarking constants declared above.
 
     All parameters are passed to PgfPlot(). See that method for documentation. Runs benchmark synchronously; blocks
@@ -36,18 +57,23 @@ def graph(filename, functions, samples, xlabel="", ylabel="", title="", caption=
         filename=filename,
         functions=functions,
         samples=samples,
-        startindex=START,
-        stopindex=STOP,
-        bm_startindex=BENCHMARK_START,
-        bm_length=BENCHMARK_LENGTH,
-        bm_interval=BENCHMARK_INTERVAL,
-        repeat=REPEAT,
+        startindex=startindex,
+        stopindex=stopindex,
+        bm_startindex=bm_startindex,
+        bm_length=bm_length,
+        bm_interval=bm_interval,
+        repeat=repeat,
         combine_method=COMBINE_METHOD,
         xlabel=xlabel,
         ylabel=ylabel,
         title=title,
-        caption=caption
     ).run()
+
+
+# ==========================
+# SECTION: Graph definitions
+# ==========================
+
 
 def testPgfPlot():
     # Create data structures
@@ -61,11 +87,77 @@ def testPgfPlot():
         "plots/testpgfplot.tex",
         [bst.insert, mylist.append],
         inputs,
-        "TEST X LABEL",
-        "TEST Y LABEL",
-        "TEST TITLE",
-        "TEST CAPTION"
+        xlabel="TEST X LABEL",
+        ylabel="TEST Y LABEL",
+        title="TEST TITLE",
     )
 
-testPgfPlot()
 
+def randomAllTiny():
+    """Performs a tiny random data test on ALL data structures under consideration."""
+
+    # Initialize data structures
+    bst = BinarySearchTree()
+    pyskip = PySkip()
+
+    # Custom benchmarking paramters
+    stop = 1010
+    bm_start = 100
+    bm_length = 10
+    bm_interval = 50
+
+    # Final setup, and invocation.
+    filename = "plots/randomAllTiny.tex"
+    functions = [bst.insert, pyskip.insert]
+    samples = generateRandomSamples(stop)
+    title = "All Data Structures, Random Input (Tiny Data Set)"
+    graph(
+        filename,
+        functions,
+        samples,
+        title=title,
+        stopindex=stop,
+        bm_startindex=bm_start,
+        bm_interval=bm_interval,
+        bm_length=bm_length
+    )
+
+
+def randomAllSmall():
+    """Performs a small random data test on ALL data structures under consideration."""
+
+    # Initialize data structures
+    bst = BinarySearchTree()
+    pyskip = PySkip()
+
+    # Custom benchmarking paramters
+    stop = 5200
+    bm_start = 200
+    bm_length = 20
+    bm_interval = 200
+
+    # Final setup, and invocation.
+    filename = "plots/randomAllSmall.tex"
+    functions = [bst.insert, pyskip.insert]
+    samples = generateRandomSamples(stop)
+    title = "All Data Structures, Random Input (Small Data Set)"
+    graph(
+        filename,
+        functions,
+        samples,
+        title=title,
+        stopindex=stop,
+        bm_startindex=bm_start,
+        bm_interval=bm_interval,
+        bm_length=bm_length
+    )
+
+
+# ==========================
+# SECTION: Graph invocations
+# ==========================
+
+
+# testPgfPlot()
+randomAllTiny()
+randomAllSmall()

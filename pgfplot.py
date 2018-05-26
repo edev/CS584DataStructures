@@ -26,7 +26,6 @@ class PgfPlot:
             xlabel="",
             ylabel="",
             title="",
-            caption="",
             template="figure.template.tex",
     ):
         """Initializes all options of a BenchmarkGraph, which fall into two categories, benchmarking and LaTeX output.
@@ -68,7 +67,6 @@ class PgfPlot:
         self.xlabel = xlabel                    # LaTeX fields.
         self.ylabel = ylabel                    # LaTeX fields.
         self.title = title                      # LaTeX fields.
-        self.caption = caption                  # LaTeX fields.
         self.plots = [] * len(functions)        # Will hold created Plot objects created for corresponding functions.
 
         with open(template, 'r') as f:
@@ -78,7 +76,9 @@ class PgfPlot:
         """Runs benchmarks and writes the LaTeX Figure object with the results."""
 
         # First, run all the benchmarks, creating a plot for each.
+        print("Running benchmarks for: " + self.title)
         for f in range(len(self.functions)):
+            print("\tRunning benchmark {}...".format(f+1))
             self.plots.append(
                 BenchmarkPlot(
                     self.functions[f],
@@ -99,6 +99,15 @@ class PgfPlot:
             plots += plot.get_latex()
         # Then, strip off the final "\n".
         plots = plots[0:-1]
+
+        # Now, prepare the caption.
+        self.caption = \
+            "Average of {} operations, benchmarked every {}, starting at {}."
+        self.caption = self.caption.format(
+            self.bm_length,
+            self.bm_interval,
+            self.bm_startindex
+        )
 
         # Next, render the template.
         output = self.template.render({

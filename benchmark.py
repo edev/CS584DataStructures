@@ -15,6 +15,9 @@ STOP = BENCHMARK_START * 10 + BENCHMARK_LENGTH
 REPEAT = 1
 COMBINE_METHOD = statistics.median
 
+# Produce this many graph .tex files for each graph - so you can choose the best data set later in LaTeX.
+DATA_SETS_TO_PRODUCE = 5
+
 # Convenience constant for generating samples of the same size as the benchmark
 SAMPLE_SIZE = STOP - START
 
@@ -54,21 +57,41 @@ def graph(
 
     No return value."""
 
-    PgfPlot(
-        filename=filename,
-        functions=functions,
-        samples=samples,
-        startindex=startindex,
-        stopindex=stopindex,
-        bm_startindex=bm_startindex,
-        bm_length=bm_length,
-        bm_interval=bm_interval,
-        repeat=repeat,
-        combine_method=COMBINE_METHOD,
-        xlabel=xlabel,
-        ylabel=ylabel,
-        title=title,
-    ).run()
+    if DATA_SETS_TO_PRODUCE > 1:
+        for i in range(1, DATA_SETS_TO_PRODUCE + 1):
+            PgfPlot(
+                # Split filename to add _1, _2, _3, etc.
+                filename=filename[0:-4] + str(i) + filename[-4:],
+                functions=functions,
+                samples=samples,
+                startindex=startindex,
+                stopindex=stopindex,
+                bm_startindex=bm_startindex,
+                bm_length=bm_length,
+                bm_interval=bm_interval,
+                repeat=repeat,
+                combine_method=COMBINE_METHOD,
+                xlabel=xlabel,
+                ylabel=ylabel,
+                title=title,
+            ).run()
+
+    else:
+        PgfPlot(
+            filename=filename,
+            functions=functions,
+            samples=samples,
+            startindex=startindex,
+            stopindex=stopindex,
+            bm_startindex=bm_startindex,
+            bm_length=bm_length,
+            bm_interval=bm_interval,
+            repeat=repeat,
+            combine_method=COMBINE_METHOD,
+            xlabel=xlabel,
+            ylabel=ylabel,
+            title=title,
+        ).run()
 
 
 # ==========================
@@ -101,7 +124,7 @@ def randomAllMiniscule():
     pyskip = PySkip()
     stromberg_treap = StrombergTreap()
 
-    # Custom benchmarking paramters
+    # Custom benchmarking parameters
     stop = 240
     bm_start = 0
     bm_length = 10
@@ -132,7 +155,7 @@ def randomAllTiny():
     bst = BinarySearchTree()
     stromberg_treap = StrombergTreap()
 
-    # Custom benchmarking paramters
+    # Custom benchmarking parameters
     stop = 1010
     bm_start = 100
     bm_length = 10
@@ -163,7 +186,7 @@ def randomAllTinyRepeat():
     bst = BinarySearchTree()
     stromberg_treap = StrombergTreap()
 
-    # Custom benchmarking paramters
+    # Custom benchmarking parameters
     stop = 1010
     bm_start = 100
     bm_length = 10
@@ -194,7 +217,7 @@ def randomAllSmall():
     bst = BinarySearchTree()
     stromberg_treap = StrombergTreap()
 
-    # Custom benchmarking paramters
+    # Custom benchmarking parameters
     stop = 5200
     bm_start = 200
     bm_length = 20

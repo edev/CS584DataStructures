@@ -152,7 +152,7 @@ def randomAllTiny():
         bm_startindex=bm_start,
         bm_interval=bm_interval,
         bm_length=bm_length,
-        repeat=11
+        repeat=1
     )
 
 
@@ -183,7 +183,7 @@ def randomAllSmall():
         bm_startindex=bm_start,
         bm_interval=bm_interval,
         bm_length=bm_length,
-        repeat=11
+        repeat=1
     )
 
 

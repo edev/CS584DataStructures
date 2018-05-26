@@ -130,7 +130,6 @@ def randomAllTiny():
 
     # Initialize data structures
     bst = BinarySearchTree()
-    pyskip = PySkip()
     stromberg_treap = StrombergTreap()
 
     # Custom benchmarking paramters
@@ -141,7 +140,7 @@ def randomAllTiny():
 
     # Final setup, and invocation.
     filename = "plots/randomAllTiny.tex"
-    functions = [bst.insert, pyskip.insert, stromberg_treap.insert]
+    functions = [bst.insert, stromberg_treap.insert]
     samples = generateRandomSamples(stop)
     title = "All Data Structures, Random Input (Tiny Data Set)"
     graph(
@@ -162,7 +161,7 @@ def randomAllSmall():
 
     # Initialize data structures
     bst = BinarySearchTree()
-    pyskip = PySkip()
+    stromberg_treap = StrombergTreap()
 
     # Custom benchmarking paramters
     stop = 5200
@@ -172,7 +171,7 @@ def randomAllSmall():
 
     # Final setup, and invocation.
     filename = "plots/randomAllSmall.tex"
-    functions = [bst.insert, pyskip.insert]
+    functions = [bst.insert, stromberg_treap.insert]
     samples = generateRandomSamples(stop)
     title = "All Data Structures, Random Input (Small Data Set)"
     graph(
@@ -195,5 +194,5 @@ def randomAllSmall():
 
 # testPgfPlot()
 randomAllMiniscule()
-# randomAllTiny()
-# randomAllSmall()
+randomAllTiny()
+randomAllSmall()

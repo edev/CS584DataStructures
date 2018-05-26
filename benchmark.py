@@ -247,7 +247,7 @@ def randomAllSmall():
 
 
 # testPgfPlot()
-randomAllMiniscule()
-randomAllTiny()
+# randomAllMiniscule()
+# randomAllTiny()
 randomAllTinyRepeat()
 randomAllSmall()

@@ -2,7 +2,8 @@ import random
 import sys
 import statistics
 from datastructures.binarysearchtree import BinarySearchTree
-from datastructures.pyskip import Skiplist as PySkip
+from datastructures.toastdriven_pyskip import Skiplist as PySkip
+from datastructures.stromberg_treap import treap as StrombergTreap
 from pgfplot import PgfPlot
 
 # Constants defining benchmark behavior. See BenchmarkPlot in plot.py for details.
@@ -92,6 +93,37 @@ def testPgfPlot():
         title="TEST TITLE",
     )
 
+def randomAllMiniscule():
+    """Performs a miniscule random data test on ALL data structures under consideration."""
+
+    # Initialize data structures
+    bst = BinarySearchTree()
+    pyskip = PySkip()
+    stromberg_treap = StrombergTreap()
+
+    # Custom benchmarking paramters
+    stop = 240
+    bm_start = 0
+    bm_length = 10
+    bm_interval = 40
+
+    # Final setup, and invocation.
+    filename = "plots/randomAllMiniscule.tex"
+    functions = [bst.insert, pyskip.insert, stromberg_treap.insert]
+    samples = generateRandomSamples(stop)
+    title = "All Data Structures, Random Input (Miniscule Data Set)"
+    graph(
+        filename,
+        functions,
+        samples,
+        title=title,
+        stopindex=stop,
+        bm_startindex=bm_start,
+        bm_interval=bm_interval,
+        bm_length=bm_length,
+        repeat=11
+    )
+
 
 def randomAllTiny():
     """Performs a tiny random data test on ALL data structures under consideration."""
@@ -99,6 +131,7 @@ def randomAllTiny():
     # Initialize data structures
     bst = BinarySearchTree()
     pyskip = PySkip()
+    stromberg_treap = StrombergTreap()
 
     # Custom benchmarking paramters
     stop = 1010
@@ -108,7 +141,7 @@ def randomAllTiny():
 
     # Final setup, and invocation.
     filename = "plots/randomAllTiny.tex"
-    functions = [bst.insert, pyskip.insert]
+    functions = [bst.insert, pyskip.insert, stromberg_treap.insert]
     samples = generateRandomSamples(stop)
     title = "All Data Structures, Random Input (Tiny Data Set)"
     graph(
@@ -119,7 +152,8 @@ def randomAllTiny():
         stopindex=stop,
         bm_startindex=bm_start,
         bm_interval=bm_interval,
-        bm_length=bm_length
+        bm_length=bm_length,
+        repeat=11
     )
 
 
@@ -149,7 +183,8 @@ def randomAllSmall():
         stopindex=stop,
         bm_startindex=bm_start,
         bm_interval=bm_interval,
-        bm_length=bm_length
+        bm_length=bm_length,
+        repeat=11
     )
 
 
@@ -159,5 +194,6 @@ def randomAllSmall():
 
 
 # testPgfPlot()
-randomAllTiny()
-randomAllSmall()
+randomAllMiniscule()
+# randomAllTiny()
+# randomAllSmall()

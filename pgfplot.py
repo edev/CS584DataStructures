@@ -108,6 +108,8 @@ class PgfPlot:
             self.bm_interval,
             self.bm_startindex
         )
+        if self.repeat > 1:
+            self.caption += " Median of {} runs.".format(self.repeat)
 
         # Next, render the template.
         output = self.template.render({

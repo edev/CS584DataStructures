@@ -173,7 +173,9 @@ class BenchmarkPlot(Plot):
     @staticmethod
     def benchmark(function, samples, start, stop):
         """Returns the total time used by calling function(x) on every x in sample with indices in range(start, stop)"""
-        return timeit.timeit(stmt=lambda: BenchmarkPlot._benchmarkRun(function, samples, start, stop), number=1) / (stop - start)
+        time = timeit.timeit(stmt=lambda: BenchmarkPlot._benchmarkRun(function, samples, start, stop), number=1)
+        time = time / (stop - start)
+        return time
 
     @staticmethod
     def _benchmarkRun(function, samples, start, stop):

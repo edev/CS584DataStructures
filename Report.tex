@@ -6,7 +6,8 @@
 \usepackage[utf8]{inputenc} % USe UTF-8 input encoding instead of default ASCII.
 \usepackage[]{forest} % Draws trees.
 \usepackage{fancyvrb} % Allows Verbatim sections with line numbers and such. Note the capital V.
-\usepackage{pgfplots}
+\usepackage{pgfplots} % For drawing graphs
+\usepackage{hyperref} % For hyperlinks
 \pgfplotsset{compat=1.6}
 \newcommand {\todo}[1] {{\textbf{\color{red}#1}}}
 
@@ -23,16 +24,16 @@
 This paper aims to illuminate various facets of the relationship between asymptotic complexity and empirical performance of a range of related data structures. The vehicle for this exploration is a series of benchmarks of data structures that perform similar jobs in very different ways. These include binary search trees, treaps, and skip lists \todo{FINALIZE LIST OF DATA STRUCTURES}. For many tasks, they have the same asymptotic complexity, e.g. average complexity of $O(\log n)$ for search, insert, and delete operations, with worst-case complexity of $O(n)$ for each. This paper examines the performance characteristics of each and investigates how comparable the performance characteristics of these asymptotically equivalent data structures really are.
 
 \section{Testing Methodology}
+Gathering reliable data is, of course, of paramount importance to any data-based analysis. Since the analysis in this paper is based on benchmark data, the accuracy of the analysis hinges on the accuracy of the benchmarks themselves. The benchmarks included in this paper utilize the following measures to help ensure their accuracy:
 
-The core of the analysis in this paper is a collection of data sets gathered through benchmarking. Thus, it is essential to establish a reliable testing methodology, enforced through automation, to gather accurate data and ensure the integrity of the analysis that follows. The benchmarking procedure is standardized and automated through benchmark.py.
+\begin{itemize}
+    \item To minimize the impact of timer error, CPU load spikes, and so on, each data point is the average running time of a large number of operations $k$, where $k \geq 100$.
+    \item To minimize the impact of such large values of $k$, the overall sample sizes are suitably large, such that $n \geq 100 \cdot k$, where $n$ is the size of a data structure when the $k$ timed operations begin. In other words, the number of operations being timed is no larger than 1\% of the overall data structure at any point.
+    \item When necessary for accuracy, multiple passes may be combined by taking the median or mean time of the running times for each value of $n$ being plotted.
+    \item To prevent human error in transcribing graphs or plot data, all graphs are generated programmatically using the same function and included without modification.
+\end{itemize}
 
-Noise in the graphs is of paramount importance to the accuracy of the data sets. To smooth out small spikes in running times, each data point in each test consists of 1,000 operations. (This also reduces the impact of the error inherent in the timer.) At the start of the operation, the data structure contains the number of elements indicated on the graph. For instance, a data point for the insertion operation and labeled as having a data structure size of 100,000 elements consists of the average running time for the insertion operations on elements 100,001 through 101,000. This, of course, affects the overall result, as the final element is likely to require more work than the first element (in the case of insertion). In order to minimize these differences, the data structure sizes are no smaller than 100,000 elements, so that the greatest variation in data structure size from the start of any given data point's sample range to the end of the range is 1\%.
-
-In order to compensate for larger variations in system load and running time, each benchmark as described above is run three times on the same input data, and for each data point, the median of the three runs is used.
-
-Having addressed the major issues of unpredictable CPU-time fluctuations, a problem of predictable CPU-time fluctuations remains: the type of test data chosen can affect the integrity of the tests themselves. Strings as keys, of course, are poor choices, since they take linear time to compare (at least using simple string comparison). Objects with numeric keys might simulate real-world conditions well (as might strings), but they, too, may add a degree of instability to the test results, even given that Python passes references to objects. The simplest choice, with the highest likelihood of consistent performance, seems to be simple integers (within the limit of an architecture's word size). Near-constant-time integer comparisons and assignments should minimize the data themselves as sources of noise in the benchmarks to follow.
-
-\todo{Shorten the above paragraphs}
+\emph{Note that some of the graphs under \todo{TESTING DATA STRUCTURES SECTION NAME} necessarily disobey the above guidelines.}
 
 \section{Project Files}
 The Python 3 implementations included with this report are structured as follows:
@@ -48,6 +49,14 @@ To run custom benchmarks, simply follow the examples in benchmark.py. All classe
 
 \section{Data Structure Selection}
 Many implementations exist for each of these data structures, since they are well-known. 
+
+\section{Data Structure Implementations}
+All credit for implementations go to the authors of the respective data structure implementations. All data structures used are cited here.
+
+\begin{itemize}
+    \item binarysearchtree.py --- Dylan Laufenberg (written as a naive reference for these benchmarks)
+    \item pyskip.py --- taken from \url{https://github.com/toastdriven/pyskip}. Credit: Daniel Lindsley.
+\end{itemize}
 
 \todo{Charts here comparing different implementations of various data structures}
 

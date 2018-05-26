@@ -121,7 +121,7 @@ def randomAllMiniscule():
         bm_startindex=bm_start,
         bm_interval=bm_interval,
         bm_length=bm_length,
-        repeat=11
+        repeat=1
     )
 
 
@@ -153,6 +153,37 @@ def randomAllTiny():
         bm_interval=bm_interval,
         bm_length=bm_length,
         repeat=1
+    )
+
+
+def randomAllTinyRepeat():
+    """Performs a tiny random data test on ALL data structures under consideration."""
+
+    # Initialize data structures
+    bst = BinarySearchTree()
+    stromberg_treap = StrombergTreap()
+
+    # Custom benchmarking paramters
+    stop = 1010
+    bm_start = 100
+    bm_length = 10
+    bm_interval = 50
+
+    # Final setup, and invocation.
+    filename = "plots/randomAllTinyRepeat.tex"
+    functions = [bst.insert, stromberg_treap.insert]
+    samples = generateRandomSamples(stop)
+    title = "All Data Structures, Random Input (Tiny Data Set) - Median of 11 runs"
+    graph(
+        filename,
+        functions,
+        samples,
+        title=title,
+        stopindex=stop,
+        bm_startindex=bm_start,
+        bm_interval=bm_interval,
+        bm_length=bm_length,
+        repeat=11
     )
 
 
@@ -195,4 +226,5 @@ def randomAllSmall():
 # testPgfPlot()
 randomAllMiniscule()
 randomAllTiny()
+randomAllTinyRepeat()
 randomAllSmall()

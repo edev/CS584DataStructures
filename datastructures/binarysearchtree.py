@@ -4,6 +4,8 @@
 class BinarySearchTree:
     """A simple, recursive binary tree implementation. Each tree holds pointers to subtrees."""
 
+    legend_text = "Binary Search Tree"
+
     def __init__(self):
         """Initializes an empty tree."""
         self.root = None

@@ -111,13 +111,21 @@ class PgfPlot:
         if self.repeat > 1:
             self.caption += " Median of {} runs.".format(self.repeat)
 
+        # Prepare the legend.
+        legend_items = [0] * len(self.functions)
+        for i in range(len(self.functions)):
+            legend_items[i] = self.functions[i].__self__.__class__.legend_text
+        legend_inner_text = ", ".join(legend_items)
+        legend = "\legend{" + legend_inner_text + "}"
+
         # Next, render the template.
         output = self.template.render({
             "xlabel": self.xlabel,
             "ylabel": self.ylabel,
             "title": self.title,
             "caption": self.caption,
-            "plots": plots
+            "plots": plots,
+            "legend": legend
         })
 
         # Finally, write the file.

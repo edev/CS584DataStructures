@@ -222,6 +222,9 @@ class Skiplist(object):
     node_class = SkiplistNode
     max_layers = 32
 
+    # Added by Dylan Laufenberg
+    legend_text = "Pyskip (Lindsley)"
+
     def __init__(self, list_class=None, node_class=None, max_layers=None):
         if list_class is not None:
             self.list_class = list_class

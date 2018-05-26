@@ -294,6 +294,10 @@ def center(string, field_use_width, field_avail_width):
 # this is the public portion
 class treap(object):
     '''The treap class - or rather, the non-node, treap-proper'''
+
+    # Added by Dylan Laufenberg
+    legend_text = "Treap (Stromberg)"
+
     def __init__(self):
         self.root = None
         self.length = 0

@@ -4,6 +4,9 @@ import statistics
 from datastructures.binarysearchtree import BinarySearchTree
 from datastructures.toastdriven_pyskip import Skiplist as PySkip
 from datastructures.stromberg_treap import treap as StrombergTreap
+from datastructures.jenks_treap import Treap as JenksTreap
+from datastructures.pyskiplist.skiplist import SkipList as PySkipList
+from datastructures.redblacktree import RedBlackTree
 from pgfplot import PgfPlot
 
 # Constants defining benchmark behavior. See BenchmarkPlot in plot.py for details.
@@ -16,7 +19,7 @@ REPEAT = 1
 COMBINE_METHOD = statistics.median
 
 # Produce this many graph .tex files for each graph - so you can choose the best data set later in LaTeX.
-DATA_SETS_TO_PRODUCE = 5
+DATA_SETS_TO_PRODUCE = 10
 
 # Convenience constant for generating samples of the same size as the benchmark
 SAMPLE_SIZE = STOP - START
@@ -123,6 +126,9 @@ def randomAllMiniscule():
     bst = BinarySearchTree()
     pyskip = PySkip()
     stromberg_treap = StrombergTreap()
+    jenks_treap = JenksTreap()
+    pyskiplist = PySkipList()
+    redblacktree = RedBlackTree()
 
     # Custom benchmarking parameters
     stop = 240
@@ -132,7 +138,8 @@ def randomAllMiniscule():
 
     # Final setup, and invocation.
     filename = "plots/randomAllMiniscule.tex"
-    functions = [bst.insert, pyskip.insert, stromberg_treap.insert]
+    functions = \
+        [bst.insert, pyskip.insert, stromberg_treap.insert, jenks_treap.insert, pyskiplist.insert, redblacktree.insert]
     samples = generateRandomSamples(stop)
     title = "All Data Structures, Random Input (Miniscule Data Set)"
     graph(
@@ -247,7 +254,7 @@ def randomAllSmall():
 
 
 # testPgfPlot()
-# randomAllMiniscule()
+randomAllMiniscule()
 # randomAllTiny()
-randomAllTinyRepeat()
-randomAllSmall()
+# randomAllTinyRepeat()
+# randomAllSmall()

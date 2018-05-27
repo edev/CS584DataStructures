@@ -224,6 +224,7 @@ class Skiplist(object):
 
     # Added by Dylan Laufenberg
     legend_text = "Pyskip (Lindsley)"
+    # End of modification.
 
     def __init__(self, list_class=None, node_class=None, max_layers=None):
         if list_class is not None:

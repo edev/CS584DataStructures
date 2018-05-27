@@ -297,6 +297,7 @@ class treap(object):
 
     # Added by Dylan Laufenberg
     legend_text = "Treap (Stromberg)"
+    # End of modification.
 
     def __init__(self):
         self.root = None
@@ -335,6 +336,7 @@ class treap(object):
         # Modified by Dylan Laufenberg set key equal to value by default.
         if type(value) is None:
             value = key
+        # End of modification.
 
         if self.root is None:
             self.root = treap_node()

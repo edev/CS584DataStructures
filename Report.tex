@@ -11,7 +11,7 @@
 \pgfplotsset{compat=1.6}
 \newcommand {\todo}[1] {{\textbf{\color{red}#1}}}
 
-\title{CS 584 Research Project}
+\title{CS 584 Research Project \\ \large Portland State University}
 \author{ Dylan Laufenberg }
 \date{June 5, 2018}
 
@@ -30,7 +30,8 @@ Gathering reliable data is, of course, of paramount importance to any data-based
     \item To minimize the impact of timer error, CPU load spikes, and so on, each data point is the average running time of a large number of operations $k$, where $k \geq 100$.
     \item To minimize the impact of such large values of $k$, the overall sample sizes are suitably large, such that $n \geq 100 \cdot k$, where $n$ is the size of a data structure when the $k$ timed operations begin. In other words, the number of operations being timed is no larger than 1\% of the overall data structure at any point.
     \item When necessary for accuracy, multiple passes may be combined by taking the median or mean time of the running times for each value of $n$ being plotted.
-    \item To prevent human error in transcribing graphs or plot data, all graphs are generated programmatically using the same function and included without modification.
+    \item Since these benchmarks are highly sensitive to fluctuating operating conditions (e.g. CPU scheduling, RAM availability, and Python interpreter behavior), each benchmark produces multiple graphs. The most representative graph among the set is chosen for inclusion in this paper.
+    \item To prevent human error in transcribing graphs or plot data, all graphs are generated programmatically using the same function and included without modification (except to specify each graph's placement and size).
 \end{itemize}
 
 \emph{Note that some of the graphs under \todo{TESTING DATA STRUCTURES SECTION NAME} necessarily disobey the above guidelines.}
@@ -57,10 +58,15 @@ All credit for implementations go to the authors of the respective data structur
     \item binarysearchtree.py --- Dylan Laufenberg (written as a naive reference for these benchmarks)
     \item toastdriven\_pyskip.py --- Credit: Daniel Lindsley. Modified from \url{https://github.com/toastdriven/pyskip}.
     \item stromberg\_treap.py --- Credit: Dan Stromberg. Modified from \url{https://pypi.org/project/treap/}.
+    \item jenks\_treap.py --- Credit: Grant Jenks. Modified from \url{http://www.grantjenks.com/wiki/random/python_treap_implementation}. Converted from Python 2 to Python 3.
+    \item pyskiplist/ --- Credit: Geert Jansen. Modified from \url{https://pypi.org/project/pyskiplist/}.
 \end{itemize}
+
+The above data structures have been modified as needed to standardize their interfaces for insert, search, and delete operations.
 
 \todo{Charts here comparing different implementations of various data structures}
 
+\todo{Section: Asymptotic Expectations - talk about expected/average performance.}
 \newpage
 \section{Testing TikZ Pictures}
 

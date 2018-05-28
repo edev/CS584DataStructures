@@ -223,6 +223,9 @@ def randomAllSmall():
     # Initialize data structures
     bst = BinarySearchTree()
     stromberg_treap = StrombergTreap()
+    jenks_treap = JenksTreap()
+    pyskiplist = PySkipList()
+    redblacktree = RedBlackTree()
 
     # Custom benchmarking parameters
     stop = 5200
@@ -232,7 +235,8 @@ def randomAllSmall():
 
     # Final setup, and invocation.
     filename = "plots/randomAllSmall.tex"
-    functions = [bst.insert, stromberg_treap.insert]
+    functions = \
+        [bst.insert, stromberg_treap.insert, jenks_treap.insert, pyskiplist.insert, redblacktree.insert]
     samples = generateRandomSamples(stop)
     title = "All Data Structures, Random Input (Small Data Set)"
     graph(
@@ -254,7 +258,7 @@ def randomAllSmall():
 
 
 # testPgfPlot()
-randomAllMiniscule()
+# randomAllMiniscule()
 # randomAllTiny()
 # randomAllTinyRepeat()
-# randomAllSmall()
+randomAllSmall()

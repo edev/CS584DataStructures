@@ -1,6 +1,6 @@
 import trender
 import statistics
-from plot import BenchmarkPlot
+from plot import Plot, BenchmarkPlot
 
 
 class PgfPlot:
@@ -67,10 +67,16 @@ class PgfPlot:
         self.xlabel = xlabel                    # LaTeX fields.
         self.ylabel = ylabel                    # LaTeX fields.
         self.title = title                      # LaTeX fields.
-        self.plots = [] * len(functions)        # Will hold created Plot objects created for corresponding functions.
+        self.plots = []                         # Will hold created Plot objects created for corresponding functions.
 
         with open(template, 'r') as f:
             self.template = trender.TRender(f.read())
+
+    def addPlot(self, p: Plot):
+        """Adds the Plot p to the PgfPlot. This plot is treated as final data and will not be modified during run()."""
+
+        self.plots.append(p)
+
 
     def run(self):
         """Runs benchmarks and writes the LaTeX Figure object with the results."""

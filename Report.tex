@@ -8,6 +8,7 @@
 \usepackage{fancyvrb} % Allows Verbatim sections with line numbers and such. Note the capital V.
 \usepackage{pgfplots} % For drawing graphs
 \usepackage{hyperref} % For hyperlinks
+\usepackage{subcaption} % For subfigure environment
 \pgfplotsset{compat=1.6}
 \newcommand {\todo}[1] {{\textbf{\color{red}#1}}}
 
@@ -32,6 +33,7 @@ Gathering reliable data is, of course, of paramount importance to any data-based
     \item When necessary for accuracy, multiple passes may be combined by taking the median or mean time of the running times for each value of $n$ being plotted.
     \item Since these benchmarks are highly sensitive to fluctuating operating conditions (e.g. CPU scheduling, RAM availability, and Python interpreter behavior), each benchmark produces multiple graphs. The most representative graph among the set is chosen for inclusion in this paper.
     \item To prevent human error in transcribing graphs or plot data, all graphs are generated programmatically using the same function and included without modification (except to specify each graph's placement and size).
+    \item All tests are performed on the same computer, an Intel i7-4930k with 16 GB of DDR3 running at 2133 MHz. The CPU is water-cooled to prevent thermal throttling and overclocked beyond its Turbo frequency, which should further stabilize the benchmark results.
 \end{itemize}
 
 \emph{Note that some of the graphs under \todo{TESTING DATA STRUCTURES SECTION NAME} necessarily disobey the above guidelines.}
@@ -48,11 +50,8 @@ The Python 3 implementations included with this report are structured as follows
 
 To run custom benchmarks, simply follow the examples in benchmark.py. All classes are thoroughly documented and commented.
 
-\section{Data Structure Selection}
-Many implementations exist for each of these data structures, since they are well-known. 
-
 \section{Data Structure Implementations}
-All credit for implementations go to the authors of the respective data structure implementations. All data structures used are cited here.
+The data structures in question are well-known, so many implementations exist. This paper examines the data structure implementations below, marked by the files or subfolders they occupy within datastructures/ in the project files. All credit for each implementation goes to the author of that implementation. All data structures used are cited here. Modifications are annotated in source comments.
 
 \begin{itemize}
     \item binarysearchtree.py --- Dylan Laufenberg (written as a naive reference for these benchmarks)
@@ -65,25 +64,36 @@ All credit for implementations go to the authors of the respective data structur
 
 The above data structures have been modified as needed to standardize their interfaces for insert, search, and delete operations.
 
+\section{Data Structure Selection}
+The first step in analyzing these data structures is to establish a baseline for their performance. This provides an opportunity to rule out any implementations that are too slow to consider. First, a benchmark on element insertion with only a few hundred elements reveals an outlier:
+
+\input{plots/randomAllMiniscule.tex}
+
+Clearly Pyskip is too slow for further consideration. In fact, I began with a 105-million-element benchmark that my reference BST implementation handled in about a minute. Pyskip took so long that I eventually had to cancel the benchmark. I had to pare the initial benchmark down to below 1,000 elements to achieve a running time that would not dwarf the rest of my benchmarks combined. With Pyskip eliminated, a graph with larger (But still quite modest) data sets presents a clearer picture of the comparability of the various data structures with random inputs:
+
+\input{plots/randomAllSmall.tex}
+
 \todo{Charts here comparing different implementations of various data structures}
 
 \todo{Section: Asymptotic Expectations - talk about expected/average performance.}
 \newpage
-\section{Chosen Graphs}
-\input{plots/randomAllMiniscule.tex}
-Remove Pyskip.
-\input{plots/randomAllSmall.tex}
 
-\section{Candidates}
-\input{plots/randomAllSmall1.tex}
-\input{plots/randomAllSmall2.tex}
-\input{plots/randomAllSmall3.tex}
-\input{plots/randomAllSmall4.tex}
-\input{plots/randomAllSmall5.tex}
-\input{plots/randomAllSmall6.tex}
-\input{plots/randomAllSmall7.tex}
-\input{plots/randomAllSmall8.tex}
-\input{plots/randomAllSmall9.tex}
-\input{plots/randomAllSmall10.tex}
+
+
+\section{Chosen Graphs}
+
+Remove Pyskip.
+
+%\section{Candidates}
+%\input{plots/randomAllSmall1.tex}
+%\input{plots/randomAllSmall2.tex}
+%\input{plots/randomAllSmall3.tex}
+%\input{plots/randomAllSmall4.tex}
+%\input{plots/randomAllSmall5.tex}
+%\input{plots/randomAllSmall6.tex}
+%\input{plots/randomAllSmall7.tex}
+%\input{plots/randomAllSmall8.tex}
+%\input{plots/randomAllSmall9.tex}
+%\input{plots/randomAllSmall10.tex}
 
 \end{document}

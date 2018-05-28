@@ -141,7 +141,7 @@ def randomAllMiniscule():
     functions = \
         [bst.insert, pyskip.insert, stromberg_treap.insert, jenks_treap.insert, pyskiplist.insert, redblacktree.insert]
     samples = generateRandomSamples(stop)
-    title = "All Data Structures, Random Input (Miniscule Data Set)"
+    title = "Insert: All Data Structures, Random Input (Miniscule Data Set)"
     graph(
         filename,
         functions,
@@ -172,7 +172,7 @@ def randomAllTiny():
     filename = "plots/randomAllTiny.tex"
     functions = [bst.insert, stromberg_treap.insert]
     samples = generateRandomSamples(stop)
-    title = "All Data Structures, Random Input (Tiny Data Set)"
+    title = "Insert: All Data Structures, Random Input (Tiny Data Set)"
     graph(
         filename,
         functions,
@@ -203,7 +203,7 @@ def randomAllTinyRepeat():
     filename = "plots/randomAllTinyRepeat.tex"
     functions = [bst.insert, stromberg_treap.insert]
     samples = generateRandomSamples(stop)
-    title = "All Data Structures, Random Input (Tiny Data Set) - Median of 11 runs"
+    title = "Insert: All Data Structures, Random Input (Tiny Data Set) - Median of 11 runs"
     graph(
         filename,
         functions,
@@ -238,7 +238,7 @@ def randomAllSmall():
     functions = \
         [bst.insert, stromberg_treap.insert, jenks_treap.insert, pyskiplist.insert, redblacktree.insert]
     samples = generateRandomSamples(stop)
-    title = "All Data Structures, Random Input (Small Data Set)"
+    title = "Insert: All Data Structures, Random Input (Small Data Set)"
     graph(
         filename,
         functions,
@@ -252,6 +252,30 @@ def randomAllSmall():
     )
 
 
+def insertRandom():
+    """Performs a small random data test on ALL data structures under consideration."""
+
+    # Initialize data structures
+    bst = BinarySearchTree()
+    stromberg_treap = StrombergTreap()
+    jenks_treap = JenksTreap()
+    pyskiplist = PySkipList()
+    redblacktree = RedBlackTree()
+
+    # Final setup, and invocation.
+    filename = "plots/insertRandom.tex"
+    functions = \
+        [bst.insert, stromberg_treap.insert, jenks_treap.insert, pyskiplist.insert, redblacktree.insert]
+    samples = generateRandomSamples(SAMPLE_SIZE)
+    title = "Insert: Random Input"
+    graph(
+        filename,
+        functions,
+        samples,
+        title=title
+    )
+
+
 # ==========================
 # SECTION: Graph invocations
 # ==========================
@@ -261,4 +285,5 @@ def randomAllSmall():
 # randomAllMiniscule()
 # randomAllTiny()
 # randomAllTinyRepeat()
-randomAllSmall()
+# randomAllSmall()
+insertRandom()

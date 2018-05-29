@@ -22,7 +22,7 @@
 \paragraph{Project topic} I will implement a variety of data structures that maintain total orders on their data, e.g. 2-3 trees, treaps, and skip lists; I will choose at least one deterministic structure as a reference and at least one randomized data structure for comparison. I will experimentally evaluate the rates of growth of their run times for insertions, searches, and deletions. Based on these data, I will discuss how the performance I observe compares to the predicted asymptotic performance.
 
 \section{Introduction}
-This paper aims to illuminate various facets of the relationship between asymptotic complexity and empirical performance of a range of related data structures. The vehicle for this exploration is a series of benchmarks of data structures that perform similar jobs in very different ways. These include binary search trees, treaps, and skip lists \todo{FINALIZE LIST OF DATA STRUCTURES}. For many tasks, they have the same asymptotic complexity, e.g. average complexity of $O(\log n)$ for search, insert, and delete operations, with worst-case complexity of $O(n)$ for each. This paper examines the performance characteristics of each and investigates how comparable the performance characteristics of these asymptotically equivalent data structures really are.
+This paper aims to illuminate various facets of the relationship between asymptotic complexity and empirical performance of a range of related data structures. The vehicle for this exploration is a series of benchmarks of data structures that perform similar jobs in very different ways. These include binary search trees, treaps, skip lists, and red-black trees \todo{ADD ANY NEW DATA STRUCTURES HERE}. For many tasks, they have the same asymptotic complexity, e.g. average complexity of $O(\log n)$ for search, insert, and delete operations, with worst-case complexity of $O(n)$ for each. However, the binary search tree in particular has well-known best- and worst-case inputs. Balanced trees like the red-black tree are designed to mitigate these worst-case input scenarios by ensuring a balanced tree structure. The randomized treap and skip list data structures, on the other hand, rely on different randomization techniques to maintain fast expected performance with a tree and a list structure, respectively. These different approaches to potential worst-case inputs will make for interesting comparisons across the board. This paper examines the performance characteristics of each data structure through careful benchmarks and asks how comparable the performance characteristics of these asymptotically equivalent data structures really are.
 
 \section{Testing Methodology}
 Gathering reliable data is, of course, of paramount importance to any data-based analysis. Since the analysis in this paper is based on benchmark data, the accuracy of the analysis hinges on the accuracy of the benchmarks themselves. The benchmarks included in this paper utilize the following measures to help ensure their accuracy:
@@ -34,6 +34,7 @@ Gathering reliable data is, of course, of paramount importance to any data-based
     \item Since these benchmarks are highly sensitive to fluctuating operating conditions (e.g. CPU scheduling, RAM availability, and Python interpreter behavior), each benchmark produces multiple graphs. The most representative graph among the set is chosen for inclusion in this paper.
     \item To prevent human error in transcribing graphs or plot data, all graphs are generated programmatically using the same function and included without modification (except to specify each graph's placement and size).
     \item All tests are performed on the same computer, an Intel i7-4930k with 16 GB of DDR3 running at 2133 MHz. The CPU is water-cooled to prevent thermal throttling and overclocked beyond its Turbo frequency, which should further stabilize the benchmark results.
+    \item Random samples are chosen by shuffling integers in the range [0, $n$), where $n$ is the number of samples required. This prevents repeated values, which means that there are no repeated keys within any data structure. This is important for benchmarking searches and deletes, since they will act on the first matching key they find: multiple keys would skew these benchmarks in potentially unpredictable ways.
 \end{itemize}
 
 \emph{Note that some of the graphs under \todo{TESTING DATA STRUCTURES SECTION NAME} necessarily disobey the above guidelines.}
@@ -64,36 +65,47 @@ The data structures in question are well-known, so many implementations exist. T
 
 The above data structures have been modified as needed to standardize their interfaces for insert, search, and delete operations.
 
-\section{Data Structure Selection}
+\section{Benchmarking the Implementations}
 The first step in analyzing these data structures is to establish a baseline for their performance. This provides an opportunity to rule out any implementations that are too slow to consider. First, a benchmark on element insertion with only a few hundred elements reveals an outlier:
 
 \input{plots/randomAllMiniscule.tex}
 
-Clearly Pyskip is too slow for further consideration. In fact, I began with a 105-million-element benchmark that my reference BST implementation handled in about a minute. Pyskip took so long that I eventually had to cancel the benchmark. I had to pare the initial benchmark down to below 1,000 elements to achieve a running time that would not dwarf the rest of my benchmarks combined. With Pyskip eliminated, a graph with larger (But still quite modest) data sets presents a clearer picture of the comparability of the various data structures with random inputs:
+Clearly Pyskip is too slow for further consideration. In fact, I began with a 105-million-element benchmark that my reference BST implementation handled in about a minute. Pyskip took so long that I eventually had to cancel the benchmark. I had to pare the initial benchmark down to below 1,000 elements to achieve a running time that would not dwarf the rest of my benchmarks combined. With Pyskip eliminated, a graph with larger (but still quite modest) data sets presents a clearer picture of the comparability of the various data structures with random inputs:
 
 \input{plots/randomAllSmall.tex}
 
-\todo{Charts here comparing different implementations of various data structures}
+Based on these benchmark results, the only remaining skiplist implementation is again the clear outlier, but in this case, the difference is much less pronounced. Compared to the binary search tree reference implementation, PySkipList benchmarks on insertion at only about 2.5 times slower, and this, of course, is under ideal conditions for a binary search tree.
 
-\todo{Section: Asymptotic Expectations - talk about expected/average performance.}
+Comparing the Stromberg and Jenks treaps, the latter appears to be two or three times after in this particular benchmark. Interestingly, both are comparable or superior to the binary search tree, and the Jenks treap is even faster than the Sysoev red-black tree! Because the treaps provide such interesting counterpoints, both to one another and to the deterministic data structures used here, I will keep both. Thus, the data structures are finalized.
+
+\section{Choosing Inputs \& Benchmarks}
+- Randomized
+- Well-known worst case
+- Real-world data sets?
+
+- Use a single ISDBenchmark class to produce 3 standard benchmarks
+- Update the project files section to describe/list it
+- Update the project files section's description of BenchmarkPlot accordingly
+
+\todo{Finish this section}
+
+\todo{Write something like an ISDBenchmark class that produces 3 Plots}
+
+\todo{Section: Asymptotic Expectations - talk about expected/average performance. (Talk about it in each subjection.)}
 \newpage
 
 
 
-\section{Chosen Graphs}
-
-Remove Pyskip.
-
-%\section{Candidates}
-%\input{plots/randomAllSmall1.tex}
-%\input{plots/randomAllSmall2.tex}
-%\input{plots/randomAllSmall3.tex}
-%\input{plots/randomAllSmall4.tex}
-%\input{plots/randomAllSmall5.tex}
-%\input{plots/randomAllSmall6.tex}
-%\input{plots/randomAllSmall7.tex}
-%\input{plots/randomAllSmall8.tex}
-%\input{plots/randomAllSmall9.tex}
-%\input{plots/randomAllSmall10.tex}
+% \section{Candidates}
+% \input{plots/insertRandom1.tex}
+% \input{plots/insertRandom2.tex}
+% \input{plots/insertRandom3.tex}
+% \input{plots/insertRandom4.tex}
+% \input{plots/insertRandom5.tex}
+% \input{plots/insertRandom6.tex}
+% \input{plots/insertRandom7.tex}
+% \input{plots/insertRandom8.tex}
+% \input{plots/insertRandom9.tex}
+% \input{plots/insertRandom10.tex}
 
 \end{document}

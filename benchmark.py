@@ -30,13 +30,11 @@ XLABEL = "Numer of items in data structure"
 YLABEL = "Running time (second)"
 
 
-def generateRandomSamples(n=SAMPLE_SIZE, min=0, max=sys.maxsize):
+def generateRandomSamples(n=SAMPLE_SIZE):
     """Returns an n-sized array populated with random values in the range of [min, max]."""
 
     print("Generating random array of size {}".format(n))
-    array = [0] * n
-    for i in range(n):
-        array[i] = random.randrange(min, max+1)
+    return random.sample(list(range(n)), n)
     return array
 
 
@@ -135,6 +133,8 @@ def generateRandomSIDSampleSet(
         print("Choosing search samples {} up to {}".format(search_start_index, search_stop_index))
         for i in range(search_start_index, search_stop_index):
             # Choose a random element from the items that have been chosen so far.
+            # TODO Change this whole loop to a random.sample call
+            # TODO Make search_samples a list of size final_stop_index
             search_samples.append(random.choice(insert_samples[:insert_index]))
 
         # Now we'll increment our search indices.

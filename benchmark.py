@@ -436,7 +436,7 @@ def testGenerateRandomSIDSampleSet():
     print("delete_samples = {}".format(d))
 
 
-def testRandomSIDGraph():
+def randomSID():
     """Performs a small random data test on all data structures under consideration, for testing."""
 
     (search_samples, insert_samples, delete_samples) = generateRandomSIDSampleSet()  # 210, 40, 10, 40)
@@ -450,7 +450,7 @@ def testRandomSIDGraph():
     # avltree = AVLTree()
 
     # Final setup, and invocation.
-    base_filename = "plots/testRandomSID.tex"
+    base_filename = "plots/random.tex"
     search_filename = base_filename[0:-4] + "_search" + base_filename[-4:]
     insert_filename = base_filename[0:-4] + "_insert" + base_filename[-4:]
     delete_filename = base_filename[0:-4] + "_delete" + base_filename[-4:]
@@ -492,4 +492,4 @@ def testRandomSIDGraph():
 # insertRandom()
 # testGenerateRandomSIDSampleSet()
 # testRandomSID()
-testRandomSIDGraph()
+# randomSID()

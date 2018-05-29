@@ -78,28 +78,7 @@ class PgfPlot:
         self.plots.append(p)
 
 
-    def run(self):
-        """Runs benchmarks and writes the LaTeX Figure object with the results."""
-
-        # First, run all the benchmarks, creating a plot for each.
-        print("Running benchmarks for: " + self.title)
-        for f in range(len(self.functions)):
-            print("\tRunning benchmark {}...".format(f+1))
-            self.plots.append(
-                BenchmarkPlot(
-                    self.functions[f],
-                    self.samples,
-                    self.startindex,
-                    self.stopindex,
-                    self.bm_startindex,
-                    self.bm_length,
-                    self.bm_interval,
-                    self.repeat,
-                    self.combine_method
-                )
-            )
-
-        # Then, prepare the plots for LaTeX output.
+    def write(self):
         plots = ""
         for plot in self.plots:
             plots += plot.get_latex()
@@ -137,3 +116,34 @@ class PgfPlot:
         # Finally, write the file.
         with open(self.filename, "w") as f:
             f.write(output)
+
+
+    def run(self):
+        """Runs benchmarks for all functions in self.functions, producing plots for them."""
+
+        print("Running benchmarks for: " + self.title)
+        for f in range(len(self.functions)):
+            print("\tRunning benchmark {}...".format(f + 1))
+            self.plots.append(
+                BenchmarkPlot(
+                    self.functions[f],
+                    self.samples,
+                    self.startindex,
+                    self.stopindex,
+                    self.bm_startindex,
+                    self.bm_length,
+                    self.bm_interval,
+                    self.repeat,
+                    self.combine_method
+                )
+            )
+
+
+    def runAndWrite(self):
+        """Runs benchmarks and writes the LaTeX Figure object with the results."""
+
+        # First, run all the benchmarks, creating a plot for each.
+        self.run()
+
+        # Then, prepare the plots for LaTeX output.
+        self.write()

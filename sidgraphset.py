@@ -55,50 +55,50 @@ class SIDGraphSet:
         # or functions to run. In fact, all options related to benchmarking will be empty.
         search_graph = PgfPlot(
             filename=search_filename,
-            functions=[],
+            functions=searches,
             samples=[],
             startindex=0,
-            stopindex=0,
-            bm_startindex=0,
-            bm_length=0,
-            bm_interval=0,
+            stopindex=stop,
+            bm_startindex=bm_start,
+            bm_length=bm_length,
+            bm_interval=bm_interval,
             repeat=0,
             combine_method=None,
             xlabel=xlabel,
             ylabel=ylabel,
-            title=title,
+            title="Search: " + title,
             template=template
         )
         insert_graph = PgfPlot(
             filename=insert_filename,
-            functions=[],
+            functions=inserts,
             samples=[],
             startindex=0,
-            stopindex=0,
-            bm_startindex=0,
-            bm_length=0,
-            bm_interval=0,
+            stopindex=stop,
+            bm_startindex=bm_start,
+            bm_length=bm_length,
+            bm_interval=bm_interval,
             repeat=0,
             combine_method=None,
             xlabel=xlabel,
             ylabel=ylabel,
-            title=title,
+            title="Insert: " + title,
             template=template
         )
         delete_graph = PgfPlot(
             filename=delete_filename,
-            functions=[],
+            functions=deletes,
             samples=[],
             startindex=0,
-            stopindex=0,
-            bm_startindex=0,
-            bm_length=0,
-            bm_interval=0,
+            stopindex=stop,
+            bm_startindex=bm_start,
+            bm_length=bm_length,
+            bm_interval=bm_interval,
             repeat=0,
             combine_method=None,
             xlabel=xlabel,
             ylabel=ylabel,
-            title=title,
+            title="Delete: " + title,
             template=template
         )
 
@@ -129,9 +129,9 @@ class SIDGraphSet:
             delete_graph.addPlot(benchmarks[i].delete_plot)
 
         # Finally, we'll run our PgfPlots.
-        search_graph.run()
-        insert_graph.run()
-        delete_graph.run()
+        search_graph.write()
+        insert_graph.write()
+        delete_graph.write()
 
 
 class SIDBenchmark:

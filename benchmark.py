@@ -28,8 +28,8 @@ DATA_SETS_TO_PRODUCE = 10
 SAMPLE_SIZE = STOP - START
 
 # Constants determining default graph labels. Override in the call to graph() if desired.
-XLABEL = "Numer of items in data structure"
-YLABEL = "Running time (second)"
+XLABEL = "Number of items in data structure"
+YLABEL = "Running time (seconds)"
 
 
 def generateRandomSamples(n=SAMPLE_SIZE):
@@ -77,7 +77,7 @@ def graph(
                 xlabel=xlabel,
                 ylabel=ylabel,
                 title=title,
-            ).run()
+            ).runAndWrite()
 
     else:
         PgfPlot(
@@ -94,7 +94,7 @@ def graph(
             xlabel=xlabel,
             ylabel=ylabel,
             title=title,
-        ).run()
+        ).runAndWrite()
 
 
 def generateRandomSIDSampleSet(
@@ -464,7 +464,7 @@ def testRandomSIDGraph():
         [bst.insert, stromberg_treap.insert, jenks_treap.insert, pyskiplist.insert, redblacktree.add]
     deletes = \
         [bst.delete, stromberg_treap.remove, jenks_treap.__delitem__, pyskiplist.remove, redblacktree.remove]
-    title = "Insert: Random Input"
+    title = "Random Input"
     graphSID(
         search_filename,
         insert_filename,
@@ -489,10 +489,10 @@ def testRandomSIDGraph():
 
 
 # testPgfPlot()
-randomAllMiniscule()
+# randomAllMiniscule()
 # randomAllTiny()
 # randomAllTinyRepeat()
-randomAllSmall()
+# randomAllSmall()
 # insertRandom()
 # testGenerateRandomSIDSampleSet()
 # testRandomSID()

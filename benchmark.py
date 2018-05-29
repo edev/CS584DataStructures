@@ -132,11 +132,7 @@ def generateRandomSIDSampleSet(
 
         # Imagining we've just inserted up through insert_index...
         print("Choosing search samples {} up to {}".format(search_start_index, search_stop_index))
-        for i in range(search_start_index, search_stop_index):
-            # Choose a random element from the items that have been chosen so far.
-            # TODO Change this whole loop to a random.sample call
-            # TODO Make search_samples a list of size final_stop_index
-            search_samples.append(random.choice(insert_samples[:insert_index]))
+        search_samples += random.sample(insert_samples[0:insert_index], bm_length)
 
         # Now we'll increment our search indices.
         search_start_index = search_stop_index
@@ -443,7 +439,7 @@ def testGenerateRandomSIDSampleSet():
 def testRandomSIDGraph():
     """Performs a small random data test on all data structures under consideration, for testing."""
 
-    (search_samples, insert_samples, delete_samples) = generateRandomSIDSampleSet(210, 40, 10, 40)
+    (search_samples, insert_samples, delete_samples) = generateRandomSIDSampleSet()  # 210, 40, 10, 40)
 
     # Initialize data structures
     bst = BinarySearchTree()
@@ -475,10 +471,10 @@ def testRandomSIDGraph():
         search_samples,
         insert_samples,
         delete_samples,
-        210,
-        40,
-        10,
-        40,
+        # 210,
+        # 40,
+        # 10,
+        # 40,
         title=title
     )
 

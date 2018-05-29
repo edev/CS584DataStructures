@@ -8,12 +8,21 @@
    number of black nodes.
 """
 
+class NilClass:
+    def __init__(self):
+        self.left = self.right = self.parent = None
+        self.color = False
+        self.value = 0
+
+
+Nil = NilClass()
+Nil.left = Nil.right = Nil.parent = Nil
 
 class Node:
 
     """ Implementaion of red black tree node
         a node has value, color (RED or BLACK),
-        parent node (node or None) and left and right child (node or None)
+        parent node (node or Nil) and left and right child (node or Nil)
     """
 
     RED = True
@@ -22,9 +31,9 @@ class Node:
     def __init__(self, value, color=RED):
         self.color = color
         self.value = value
-        self.left = None
-        self.right = None
-        self.parent = None
+        self.left = Nil
+        self.right = Nil
+        self.parent = Nil
 
     def __str__(self):
         return str(self.value) + ':' + str('R' if self.color else 'B')
@@ -32,7 +41,6 @@ class Node:
     def verbose(self):
         return '{} (parent:{} left:{} right:{})'.format(
             self, self.parent, self.left, self.right)
-
 
 class RedBlackTree:
     """ Implementation of Red Black Tree """
@@ -42,11 +50,11 @@ class RedBlackTree:
     # End of modification.
 
     def __init__(self):
-        self.root = None
+        self.root = Nil
 
-    def max_depth(self, root=None):
+    def max_depth(self, root=Nil):
         """ return max depth of tree """
-        if root is None:
+        if root == Nil:
             return 0
         else:
             return max(self.max_depth(root.left),
@@ -56,7 +64,7 @@ class RedBlackTree:
         """ returns the value of the node depth
             relative to the root of the tree
         """
-        if node is None:
+        if node is Nil:
             return 0
         node_ = node
         depth = 0
@@ -65,28 +73,28 @@ class RedBlackTree:
             depth += 1
         return depth
 
-    def min(self, current=None):
+    def min(self, current=Nil):
         """ return minimum value in tree """
         if not current:
             current = self.root
-        while current.left is not None:
+        while current.left != Nil:
             current = current.left
         return current
 
-    def max(self, current=None):
+    def max(self, current=Nil):
         """ return maximum value in tree """
         if not current:
             current = self.root
-        while current.right is not None:
+        while current.right != Nil:
             current = current.right
         return current
 
     def search(self, value):
-        """ return a Node with given value otherwise None"""
+        """ return a Node with given value otherwise Nil"""
         return self.__search(self.root, value)
 
     def __search(self, node, value):
-        while node is not None and value != node.value:
+        while node != Nil and value != node.value:
             if value < node.value:
                 node = node.left
             else:
@@ -96,16 +104,16 @@ class RedBlackTree:
     def successor(self, value):
         """ return a node with nearest number that is more than given """
         current = self.search(value)
-        if current is None:
+        if current == Nil:
             raise Exception(('a Node with value ({})'
                              ' does not exist').format(value))
         return self.__successor(current)
 
     def __successor(self, current):
 
-        if current.right is not None:
+        if current.right != Nil:
             return self.min(current.right)
-        while (current.parent is not None
+        while (current.parent != Nil
                and current.parent.right is current):
             current = current.parent
         return current.parent
@@ -116,8 +124,8 @@ class RedBlackTree:
         node = Node(key)
         # start from root of tree
         x = self.root
-        y = None
-        while x is not None:
+        y = Nil
+        while x != Nil:
             # find a parent for Node
             y = x
             if key < x.value:
@@ -126,7 +134,7 @@ class RedBlackTree:
                 x = x.right
         # set parent for current Node
         node.parent = y
-        if y is None:
+        if y == Nil:
             # set Node as new tree root
             self.root = node
         elif key < y.value:
@@ -136,8 +144,8 @@ class RedBlackTree:
             # set Node as right branch
             y.right = node
         # set default value for current Node
-        node.left = None
-        node.right = None
+        node.left = Nil
+        node.right = Nil
         node.color = Node.RED
         # run fixup function for
         # restore red black properties of the tree
@@ -150,7 +158,7 @@ class RedBlackTree:
             if x.parent == x.parent.parent.left:
                 # we are on left branch
                 y = x.parent.parent.right
-                if y is not None and y.color == Node.RED:
+                if y != Nil and y.color == Node.RED:
                     # parent is red
                     x.parent.color = Node.BLACK
                     y.color = Node.BLACK
@@ -171,7 +179,7 @@ class RedBlackTree:
             else:
                 # mirror image of above code
                 y = x.parent.parent.left
-                if y is not None and y.color == Node.RED:
+                if y != Nil and y.color == Node.RED:
                     # parent is red
                     x.parent.color = Node.BLACK
                     y.color = Node.BLACK
@@ -193,7 +201,7 @@ class RedBlackTree:
     def __left_rotate(self, x):
         """ transformation of the left subtree to the right subtree """
         if not x.right:
-            raise Exception("a right branch of Node is None")
+            raise Exception("a right branch of Node is Nil")
         # get right subtree
         y = x.right
         # transformation of the left subtree to the right
@@ -218,7 +226,7 @@ class RedBlackTree:
     def __right_rotate(self, x):
         """ transformation of the right subtree to the left subtree """
         if not x.left:
-            raise Exception("a right branch of Node is None")
+            raise Exception("a right branch of Node is Nil")
         # get left subtree
         y = x.left
         # transformation of the right subtree to the left
@@ -242,13 +250,13 @@ class RedBlackTree:
 
     def transplant(self, node, newnode):
         """ transplant new node to current node """
-        if node.parent is None:
+        if node.parent == Nil:
             self.root = newnode
         elif node == node.parent.left:
             node.parent.left = newnode
         else:
             node.parent.right = newnode
-        if newnode is not None:
+        if newnode != Nil:
             newnode.parent = node.parent
 
     def delete(self, value):
@@ -259,10 +267,10 @@ class RedBlackTree:
     def __delete(self, node):
         y = node
         color = y.color
-        if node.left is None:
+        if node.left == Nil:
             x = node.right
             self.transplant(node, node.right)
-        elif node.right is None:
+        elif node.right == Nil:
             x = node.left
             self.transplant(node, node.left)
         else:
@@ -270,12 +278,11 @@ class RedBlackTree:
             color = y.color
             x = y.right
             # Modified by Dylan Laufenberg:
-            # Move the None-guards inside the if-else so that the if clause runs any time y.parent == node,
-            # regardless of whether x or x.parent is None. The original version executed the else clause in these
-            # cases, which is incorrect (and can cause an AttributeError if y.right becomes None).
+            # Remove the None-guards as part of refactoring to use Nil. Also, those None-guards caused the
+            # else clause to execute if x was T.nil (in textbook notation), even if y.parent == node, and
+            # that's incorrect.
             if y.parent == node:
-                if x is not None and x.parent is not None:
-                    x.parent = y
+                x.parent = y
             # End modifications.
             else:
                 self.transplant(y, y.right)
@@ -293,29 +300,12 @@ class RedBlackTree:
     def __delete_fixup(self, x):
         """ restore red-black tree properties after insert new node """
 
-        # Added by Dylan Laufenberg
-        # Cormen et al seems to miss the case where x is a leaf (T.nil in the book or None in this implementation).
-        # Explanation/justification:
-        #   1. This method is only invoked when y in __delete was originally black.
-        #   2. If y originally had a non-leaf child, it would have been passed as x.
-        #       a. If node.left was originally None, x would be node.right, which might or might not be None.
-        #       b. Else node.left was not None, so either node.left or a non-left from node's right subtree would have
-        #          been chosen.
-        #   3. Therefore, y was originally a black node with two leaves (i.e. y.left is None and y.right is None).
-        #      Thus, x is now a doubly black leaf.
-        # Since x is doubly black, a rotation is required. However, the very first thing the algorithm does is attempt
-        # to read x's parent. Even with the book's version where leaves are pointers to T.nil, this information STILL
-        # would not be available! So, we must augment the method call with a parent and modify the algorithm to use it
-        # appropriately.
-
-        # Now, what to do?....
-        
         while x != self.root and x.color == Node.BLACK:
             # we have a violation
             if x == x.parent.left:
                 # we are on left branch
                 y = x.parent.right
-                if y is not None and y.color == Node.RED:
+                if y != Nil and y.color == Node.RED:
                     # parent is red
                     y.color = Node.BLACK
                     x.parent.color = Node.RED
@@ -342,7 +332,7 @@ class RedBlackTree:
             else:
 
                 y = x.parent.left
-                if y is not None and y.color == Node.RED:
+                if y != Nil and y.color == Node.RED:
                     # parent is red
                     y.color = Node.BLACK
                     x.parent.color = Node.RED

@@ -454,11 +454,11 @@ def testRandomSIDGraph():
     insert_filename = base_filename[0:-4] + "_insert" + base_filename[-4:]
     delete_filename = base_filename[0:-4] + "_delete" + base_filename[-4:]
     searches = \
-        [bst.search, stromberg_treap.get_key, jenks_treap.__getitem__, pyskiplist.search, ]#redblacktree.search]
+        [bst.search, stromberg_treap.get_key, jenks_treap.__getitem__, pyskiplist.search, redblacktree.search]
     inserts = \
-        [bst.insert, stromberg_treap.insert, jenks_treap.insert, pyskiplist.insert, ]#redblacktree.insert]
+        [bst.insert, stromberg_treap.insert, jenks_treap.insert, pyskiplist.insert, redblacktree.insert]
     deletes = \
-        [bst.delete, stromberg_treap.remove, jenks_treap.__delitem__, pyskiplist.remove, ]#redblacktree.delete]
+        [bst.delete, stromberg_treap.remove, jenks_treap.__delitem__, pyskiplist.remove, redblacktree.delete]
     title = "Insert: Random Input"
     graphSID(
         search_filename,

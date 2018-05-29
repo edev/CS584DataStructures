@@ -269,8 +269,14 @@ class RedBlackTree:
             y = self.min(node.right)
             color = y.color
             x = y.right
-            if x is not None and x.parent is not None and y.parent == node:
-                x.parent = y
+            # Modified by Dylan Laufenberg:
+            # Move the None-guards inside the if-else so that the if clause runs any time y.parent == node,
+            # regardless of whether x or x.parent is None. The original version executed the else clause in these
+            # cases, which is incorrect (and can cause an AttributeError if y.right becomes None).
+            if y.parent == node:
+                if x is not None and x.parent is not None:
+                    x.parent = y
+            # End modifications.
             else:
                 self.transplant(y, y.right)
                 y.right = node.right
@@ -286,6 +292,24 @@ class RedBlackTree:
 
     def __delete_fixup(self, x):
         """ restore red-black tree properties after insert new node """
+
+        # Added by Dylan Laufenberg
+        # Cormen et al seems to miss the case where x is a leaf (T.nil in the book or None in this implementation).
+        # Explanation/justification:
+        #   1. This method is only invoked when y in __delete was originally black.
+        #   2. If y originally had a non-leaf child, it would have been passed as x.
+        #       a. If node.left was originally None, x would be node.right, which might or might not be None.
+        #       b. Else node.left was not None, so either node.left or a non-left from node's right subtree would have
+        #          been chosen.
+        #   3. Therefore, y was originally a black node with two leaves (i.e. y.left is None and y.right is None).
+        #      Thus, x is now a doubly black leaf.
+        # Since x is doubly black, a rotation is required. However, the very first thing the algorithm does is attempt
+        # to read x's parent. Even with the book's version where leaves are pointers to T.nil, this information STILL
+        # would not be available! So, we must augment the method call with a parent and modify the algorithm to use it
+        # appropriately.
+
+        # Now, what to do?....
+        
         while x != self.root and x.color == Node.BLACK:
             # we have a violation
             if x == x.parent.left:

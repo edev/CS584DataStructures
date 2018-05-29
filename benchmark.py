@@ -6,7 +6,9 @@ from datastructures.toastdriven_pyskip import Skiplist as PySkip
 from datastructures.stromberg_treap import treap as StrombergTreap
 from datastructures.jenks_treap import Treap as JenksTreap
 from datastructures.pyskiplist.skiplist import SkipList as PySkipList
-from datastructures.redblacktree import RedBlackTree
+# from datastructures.redblacktree import RedBlackTree
+from datastructures.avltree import BinaryTree as AVLTree
+from datastructures.enether_rbtree import RedBlackTree
 from pgfplot import PgfPlot
 from sidgraphset import SIDGraphSet, SIDBenchmark
 
@@ -35,7 +37,6 @@ def generateRandomSamples(n=SAMPLE_SIZE):
 
     print("Generating random array of size {}".format(n))
     return random.sample(list(range(n)), n)
-    return array
 
 
 def graph(
@@ -248,6 +249,7 @@ def randomAllMiniscule():
     jenks_treap = JenksTreap()
     pyskiplist = PySkipList()
     redblacktree = RedBlackTree()
+    # avltree = AVLTree()
 
     # Custom benchmarking parameters
     stop = 240
@@ -258,7 +260,7 @@ def randomAllMiniscule():
     # Final setup, and invocation.
     filename = "plots/randomAllMiniscule.tex"
     functions = \
-        [bst.insert, pyskip.insert, stromberg_treap.insert, jenks_treap.insert, pyskiplist.insert, redblacktree.insert]
+        [bst.insert, pyskip.insert, stromberg_treap.insert, jenks_treap.insert, pyskiplist.insert, redblacktree.add]
     samples = generateRandomSamples(stop)
     title = "Insert: All Data Structures, Random Input (Miniscule Data Set)"
     graph(
@@ -345,6 +347,7 @@ def randomAllSmall():
     jenks_treap = JenksTreap()
     pyskiplist = PySkipList()
     redblacktree = RedBlackTree()
+    # avltree = AVLTree()
 
     # Custom benchmarking parameters
     stop = 5200
@@ -355,7 +358,7 @@ def randomAllSmall():
     # Final setup, and invocation.
     filename = "plots/randomAllSmall.tex"
     functions = \
-        [bst.insert, stromberg_treap.insert, jenks_treap.insert, pyskiplist.insert, redblacktree.insert]
+        [bst.insert, stromberg_treap.insert, jenks_treap.insert, pyskiplist.insert, redblacktree.add]
     samples = generateRandomSamples(stop)
     title = "Insert: All Data Structures, Random Input (Small Data Set)"
     graph(
@@ -380,11 +383,12 @@ def insertRandom():
     jenks_treap = JenksTreap()
     pyskiplist = PySkipList()
     redblacktree = RedBlackTree()
+    # avltree = AVLTree()
 
     # Final setup, and invocation.
     filename = "plots/insertRandom.tex"
     functions = \
-        [bst.insert, stromberg_treap.insert, jenks_treap.insert, pyskiplist.insert, redblacktree.insert]
+        [bst.insert, stromberg_treap.insert, jenks_treap.insert, pyskiplist.insert, redblacktree.add]
     samples = generateRandomSamples(SAMPLE_SIZE)
     title = "Insert: Random Input"
     graph(
@@ -447,6 +451,7 @@ def testRandomSIDGraph():
     jenks_treap = JenksTreap()
     pyskiplist = PySkipList()
     redblacktree = RedBlackTree()
+    # avltree = AVLTree()
 
     # Final setup, and invocation.
     base_filename = "plots/testRandomSID.tex"
@@ -454,11 +459,11 @@ def testRandomSIDGraph():
     insert_filename = base_filename[0:-4] + "_insert" + base_filename[-4:]
     delete_filename = base_filename[0:-4] + "_delete" + base_filename[-4:]
     searches = \
-        [bst.search, stromberg_treap.get_key, jenks_treap.__getitem__, pyskiplist.search, redblacktree.search]
+        [bst.search, stromberg_treap.get_key, jenks_treap.__getitem__, pyskiplist.search, redblacktree.find_node]
     inserts = \
-        [bst.insert, stromberg_treap.insert, jenks_treap.insert, pyskiplist.insert, redblacktree.insert]
+        [bst.insert, stromberg_treap.insert, jenks_treap.insert, pyskiplist.insert, redblacktree.add]
     deletes = \
-        [bst.delete, stromberg_treap.remove, jenks_treap.__delitem__, pyskiplist.remove, redblacktree.delete]
+        [bst.delete, stromberg_treap.remove, jenks_treap.__delitem__, pyskiplist.remove, redblacktree.remove]
     title = "Insert: Random Input"
     graphSID(
         search_filename,
@@ -484,10 +489,10 @@ def testRandomSIDGraph():
 
 
 # testPgfPlot()
-# randomAllMiniscule()
+randomAllMiniscule()
 # randomAllTiny()
 # randomAllTinyRepeat()
-# randomAllSmall()
+randomAllSmall()
 # insertRandom()
 # testGenerateRandomSIDSampleSet()
 # testRandomSID()

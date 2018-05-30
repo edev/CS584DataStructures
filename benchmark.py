@@ -12,6 +12,22 @@ from datastructures.enether_rbtree import RedBlackTree
 from pgfplot import PgfPlot
 from sidgraphset import SIDGraphSet, SIDBenchmark
 
+
+# TABLE OF CONTENTS:
+# This file is divided into the following sections, denoted by prominent SECTION comments.
+#
+#   - Graph default configuration
+#   - Input set generators
+#   - Graph generation functions
+#   - Graph definitions
+#   - Graph invocations
+
+
+# =====================================
+# SECTION: Global default configuration
+# =====================================
+
+
 # Constants defining benchmark behavior. See BenchmarkPlot in plot.py for details.
 START = 0
 BENCHMARK_START = 100000
@@ -32,11 +48,70 @@ XLABEL = "Number of items in data structure"
 YLABEL = "Running time (seconds)"
 
 
+# =============================
+# SECTION: Input set generators
+# =============================
+
+
 def generateRandomSamples(n=SAMPLE_SIZE):
     """Returns an n-sized array populated with random values in the range of [min, max]."""
 
     print("Generating random array of size {}".format(n))
     return random.sample(list(range(n)), n)
+
+
+def generateRandomSIDSampleSet(
+        stop=STOP,
+        bm_start=BENCHMARK_START,
+        bm_length=BENCHMARK_LENGTH,
+        bm_interval=BENCHMARK_INTERVAL
+):
+    """Generates 3 random sample sets suitable for passing into an SIDBenchmark.
+
+    Returns a triple of (search_samples, insert_samples, delete_samples).
+
+    search_samples: contains random samples from the elements that have been inserted in each benchmark section.
+    insert_samples: the MASTER set. Contains everything.
+    delete_samples: contains everything in Insert, just shuffled.
+    """
+
+    # First, we can just generate insert_samples by recycling our generation function from before.
+    insert_samples = generateRandomSamples(stop)
+    search_samples = []
+
+    # Now we'll trace the benchmark cycle to produce the search samples.
+    # Each time a benchmarked insert is about to happen (i.e. bm_start + k*bm_interval), we'll be searching for
+    # bm_length items randomly chosen from the set of items inserted so far. So we'll expand our search window
+    # within insert_samples each time we reach another benchmarking start point.
+
+    # The range(start, stop) in search_samples that we're going to be adding.
+    search_start_index = 0
+    search_stop_index = bm_length
+
+    # The simulated insert_index value, i.e. the index of the next item to be inserted.
+    insert_index = bm_start
+    final_stop_index = (((stop - bm_start) // bm_interval) + 1) * bm_length
+    while search_start_index < final_stop_index:
+
+        # Imagining we've just inserted up through insert_index...
+        print("Choosing search samples {} up to {}".format(search_start_index, search_stop_index))
+        search_samples += random.sample(insert_samples[0:insert_index], bm_length)
+
+        # Now we'll increment our search indices.
+        search_start_index = search_stop_index
+        search_stop_index += bm_length
+        insert_index += bm_interval
+
+    # We'll generate delete_samples at the end with a simple random sampling.
+    print("Choosing delete samples by randomly sampling insert list")
+    delete_samples = random.sample(insert_samples, len(insert_samples))
+
+    return (search_samples, insert_samples, delete_samples)
+
+
+# ===================================
+# SECTION: Graph generation functions
+# ===================================
 
 
 def graph(
@@ -95,55 +170,6 @@ def graph(
             ylabel=ylabel,
             title=title,
         ).runAndWrite()
-
-
-def generateRandomSIDSampleSet(
-        stop=STOP,
-        bm_start=BENCHMARK_START,
-        bm_length=BENCHMARK_LENGTH,
-        bm_interval=BENCHMARK_INTERVAL
-):
-    """Generates 3 random sample sets suitable for passing into an SIDBenchmark.
-
-    Returns a triple of (search_samples, insert_samples, delete_samples).
-
-    search_samples: contains random samples from the elements that have been inserted in each benchmark section.
-    insert_samples: the MASTER set. Contains everything.
-    delete_samples: contains everything in Insert, just shuffled.
-    """
-
-    # First, we can just generate insert_samples by recycling our generation function from before.
-    insert_samples = generateRandomSamples(stop)
-    search_samples = []
-
-    # Now we'll trace the benchmark cycle to produce the search samples.
-    # Each time a benchmarked insert is about to happen (i.e. bm_start + k*bm_interval), we'll be searching for
-    # bm_length items randomly chosen from the set of items inserted so far. So we'll expand our search window
-    # within insert_samples each time we reach another benchmarking start point.
-
-    # The range(start, stop) in search_samples that we're going to be adding.
-    search_start_index = 0
-    search_stop_index = bm_length
-
-    # The simulated insert_index value, i.e. the index of the next item to be inserted.
-    insert_index = bm_start
-    final_stop_index = (((stop - bm_start) // bm_interval) + 1) * bm_length
-    while search_start_index < final_stop_index:
-
-        # Imagining we've just inserted up through insert_index...
-        print("Choosing search samples {} up to {}".format(search_start_index, search_stop_index))
-        search_samples += random.sample(insert_samples[0:insert_index], bm_length)
-
-        # Now we'll increment our search indices.
-        search_start_index = search_stop_index
-        search_stop_index += bm_length
-        insert_index += bm_interval
-
-    # We'll generate delete_samples at the end with a simple random sampling.
-    print("Choosing delete samples by randomly sampling insert list")
-    delete_samples = random.sample(insert_samples, len(insert_samples))
-
-    return (search_samples, insert_samples, delete_samples)
 
 
 def graphSID(

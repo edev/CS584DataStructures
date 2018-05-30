@@ -105,10 +105,13 @@ Finally, delete performance is almost entirely flat across all five graphs. It i
 
 \section{Benchmarks: Ordered Inputs}
 
-\input{plots/worstCase_insert.tex}
-\input{plots/worstCase_search.tex}
-\input{plots/worstCase_delete.tex}
-
+\begin{figure}[h]
+    \centering
+    \input{plots/worstCase_insert.tex}
+    \input{plots/worstCase_search.tex}
+    \input{plots/worstCase_delete.tex}
+    \caption{Average of 100 operations, benchmarked every 500, starting at 500.}
+\end{figure}
 
 \todo{Add any other input sets discussed here.}
 
@@ -133,9 +136,9 @@ Finally, delete performance is almost entirely flat across all five graphs. It i
 
 
 \section{Candidates}
-\input{plots/worstCase_delete1.tex}
-\input{plots/worstCase_delete2.tex}
-\input{plots/worstCase_delete3.tex}
+% \input{plots/worstCase_delete1.tex}
+% \input{plots/worstCase_delete2.tex}
+% \input{plots/worstCase_delete3.tex}
 % \input{plots/worstCase_insert4.tex}
 % \input{plots/worstCase_insert5.tex}
 % \input{plots/worstCase_insert6.tex}

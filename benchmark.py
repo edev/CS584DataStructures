@@ -588,7 +588,7 @@ def worstCaseSIDNoBST():
     # avltree = AVLTree()
 
     # Final setup, and invocation.
-    base_filename = "plots/worstCase.tex"
+    base_filename = "plots/worstCaseNoBST.tex"
     search_filename = base_filename[0:-4] + "_search" + base_filename[-4:]
     insert_filename = base_filename[0:-4] + "_insert" + base_filename[-4:]
     delete_filename = base_filename[0:-4] + "_delete" + base_filename[-4:]

@@ -163,7 +163,6 @@ class BenchmarkPlot(Plot):
         # We'll cycle, now, from benchmarking to non-benchmarking and back, until we reach stop.
         # For the remainder of the benchmark cycle, we will use next_benchmark to track when to start a benchmark
         # and p and q to represent the start and end, respectively, of a range that we're calculating.
-        # coord_index is the index into coordinates where the result should be stored.
         p = benchmark_start
         while p < stop:
             # Don't overshoot stop when benchmarking.
@@ -182,5 +181,3 @@ class BenchmarkPlot(Plot):
             p = q
 
         return coordinates
-
-

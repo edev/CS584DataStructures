@@ -47,6 +47,7 @@ The Python 3 implementations included with this report are structured as follows
     \item pgfplot.py --- contains the PgfPlot class, which represents one \LaTeX \ figure to be produced. This class receives and stores all parameters that affect the figure, including plots to be produced.
     \item plot.py --- contains the Plot and BenchmarkPlot classes, which represent plots in a PGFPLOT graph. The Plot class may be used to produce arbitrary plots, whereas the BenchmarkPlot class receives benchmark parameters for one function and produces the corresponding plot.
     \item benchmark.py --- sets up and runs the benchmarks used in this document by creating PgfPlot objects and running them.
+    \todo{Update me: pfgplot, plot, sidwhatever, ...}
 \end{itemize}
 
 To run custom benchmarks, simply follow the examples in benchmark.py. All classes are thoroughly documented and commented.
@@ -69,8 +70,8 @@ The data structures in question are well-known, so many implementations exist. T
 
 The above data structures have been modified as needed to standardize their interfaces for insert, search, and delete operations.
 
-\section{Benchmarking the Implementations}
-The first step in analyzing these data structures is to establish a baseline for their performance. This provides an opportunity to rule out any implementations that are too slow to consider. First, a benchmark on element insertion with only a few hundred elements reveals an outlier:
+\section{Choosing Implementations to Test}
+The first step in analyzing these data structures is to establish a baseline for their performance. This provides an opportunity to rule out any implementations that are too slow to consider (as well as a disappointing number of incorrect implementations found along the way---not included here). First, a benchmark on element insertion with only a few hundred elements reveals an outlier:
 
 \input{plots/randomAllMiniscule.tex}
 
@@ -80,12 +81,38 @@ Clearly Pyskip is too slow for further consideration. In fact, I began with a 10
 
 Based on these benchmark results, the only remaining skiplist implementation is again the clear outlier, but in this case, the difference is much less pronounced. Compared to the binary search tree reference implementation, PySkipList benchmarks on insertion at only about 2.5 times slower, and this, of course, is under ideal conditions for a binary search tree.
 
-Comparing the Stromberg and Jenks treaps, the latter appears to be two or three times after in this particular benchmark. Interestingly, both are comparable or superior to the binary search tree, and the Jenks treap is even faster than the Sysoev red-black tree! Because the treaps provide such interesting counterpoints, both to one another and to the deterministic data structures used here, I will keep both. Thus, the data structures are finalized.
+Comparing the Stromberg and Jenks treaps, the latter appears to be two or three times faster in this particular benchmark. Interestingly, both are comparable or superior to the binary search tree, and the Jenks treap is faster than both the binary search tree and the Kozlovski red-black tree! Because the treaps provide such interesting counterpoints, both to one another and to the deterministic data structures used here, I will keep both. Thus, the data structures are finalized.
 
 \section{Choosing Inputs \& Benchmarks}
+The remainder of this paper examines the above implementations' performance on the insert, search, and delete operations with large data sets ($10^6$ or larger). The two essential cases are randomized input and ordered input (the binary search tree's worst-case input). Beyond these, I will add as many more novel configurations as space allows.
+
+The SIDGraphSet and SIDBenchmark classes in sidgraphset.py perform the first two benchmark sets\todo{update this}. Their sequence, in short, is to perform insertions up to each data point, benchmark searches on selected elements that have already been inserted, benchmark insertions, and repeat. Once all insertions are complete, the sequence continues with deletions: SIDBenchmark will delete elements until it reaches the last graph point plus the sample size, benchmark deletions to the graph plot point, and continue in this way until it benchmarks the first plot point. \todo{Update this to reflect any additional benchmarks.}
+
+\section{Benchmarks: Randomized Inputs}
+Random inputs are, of course, the best-case scenario for binary search tree insertions. The other data structures should perform well on randomized inputs, too. As a result, this benchmark serves as a useful baseline for later comparisons. The average-case asymptotic performance for all four data structures is $O(\log n)$, and I expect this performance from all five implementations with this input set.
+
+\input{plots/random_search.tex}
+
+Search is perhaps the most interesting graph, because, surprisingly, the graphs of the five plots all curve to plausibly match the graph of $c \cdot \log n$ for various constant multiples $c$. Clearly, all five do in fact work in logarithmic time! (Author's note: very cool!) Both treaps are the clear winners for search. PySkipList, the slowest implementation in the small data set benchmark above, is neck-and-neck with the binary search tree. Finally, the red-black tree, the second-fastest on insertion in the small data set benchmark, is the standout slowest here.
+
+\input{plots/random_insert.tex}
+
+Next up is insertion. Here, the logarithmic graph is faintly visible at best. The most telling is perhaps the binary search tree, whose running time approximately doubles from $10^5$ elements to $10^6$ elements, in keeping with a logarithmic rate of growth.  In comparison to the small data set insertion benchmark, almost everything is the same: the treaps and red-black tree are all tightly grouped, and PySkipList takes about twice as long as the rest. However, in this best-case input for the binary search tree, it does indeed pull ahead of the pack.
+
+\input{plots/random_delete.tex}
+
+Finally, delete performance is almost entirely flat across all five graphs. It is stratified into two groups, but on closer inspection, these are easily explained. Binary search trees and treaps both enjoy relatively simple insertions and deletions, whereas red-black trees and skip lists \todo{confirm this} may require much more work for both.
+
+\section{Benchmarks: Ordered Inputs}
+
+\todo{Add any other input sets discussed here.}
+
+
 - Randomized
 - Well-known worst case
 - Real-world data sets?
+- Randomized sequence of insertions, searches, and deletes
+- Much larger data sets
 
 - Use a single ISDBenchmark class to produce 3 standard benchmarks
 - Update the project files section to describe/list it
@@ -99,9 +126,9 @@ Comparing the Stromberg and Jenks treaps, the latter appears to be two or three 
 \newpage
 
 \section{Chosen}
-\input{plots/testRandomSID_search.tex}
-\input{plots/testRandomSID_insert.tex}
-\input{plots/testRandomSID_delete.tex}
+\input{plots/random_search.tex}
+\input{plots/random_insert.tex}
+\input{plots/random_delete.tex}
 
 
 

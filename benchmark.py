@@ -560,6 +560,77 @@ def worstCaseSID():
     )
 
 
+def worstCaseSIDNoBST():
+    """Performs a full search, insert, and delete benchmark set on all data structures using the worst-case inputs
+    for binary search trees."""
+
+    # Worst-case insert: all increasing.
+    insert_samples = list(range(STOP))
+
+    # Worst-case delete: always the leaf in our worst-case structure.
+    delete_samples = insert_samples[:]
+    delete_samples.reverse()
+
+    # Worst-case search: search for the last bm_length elements in our worst-case structure. But this is harder
+    # to create since it only does a search at our various intervals.
+    search_samples = []
+    current = BENCHMARK_START
+    while current < STOP:
+        search_samples += list(range(current - BENCHMARK_LENGTH, current))
+        current = min(STOP, current + BENCHMARK_INTERVAL)
+
+    # Initialize data structures
+    # bst = BinarySearchTree()
+    stromberg_treap = StrombergTreap()
+    jenks_treap = JenksTreap()
+    pyskiplist = PySkipList()
+    redblacktree = RedBlackTree()
+    # avltree = AVLTree()
+
+    # Final setup, and invocation.
+    base_filename = "plots/worstCase.tex"
+    search_filename = base_filename[0:-4] + "_search" + base_filename[-4:]
+    insert_filename = base_filename[0:-4] + "_insert" + base_filename[-4:]
+    delete_filename = base_filename[0:-4] + "_delete" + base_filename[-4:]
+    searches = \
+        [
+            # bst.search,
+            stromberg_treap.get_key,
+            jenks_treap.__getitem__,
+            pyskiplist.search,
+            redblacktree.find_node
+        ]
+    inserts = \
+        [
+            # bst.insert,
+            stromberg_treap.insert,
+            jenks_treap.insert,
+            pyskiplist.insert,
+            redblacktree.add
+        ]
+    deletes = \
+        [
+            # bst.delete,
+            stromberg_treap.remove,
+            jenks_treap.__delitem__,
+            pyskiplist.remove,
+            redblacktree.remove
+        ]
+    title = "Worst-Case Input"
+    graphSID(
+        search_filename,
+        insert_filename,
+        delete_filename,
+        searches,
+        inserts,
+        deletes,
+        search_samples,
+        insert_samples,
+        delete_samples,
+        title=title
+    )
+
+
 # ==========================
 # SECTION: Graph invocations
 # ==========================
@@ -574,4 +645,5 @@ def worstCaseSID():
 # testGenerateRandomSIDSampleSet()
 # testRandomSID()
 # randomSID()
-worstCaseSID()
+# worstCaseSID()
+worstCaseSIDNoBST()

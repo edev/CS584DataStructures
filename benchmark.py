@@ -11,6 +11,7 @@ from datastructures.avltree import BinaryTree as AVLTree
 from datastructures.enether_rbtree import RedBlackTree
 from pgfplot import PgfPlot
 from sidgraphset import SIDGraphSet, SIDBenchmark
+from mixedsidbenchmarkplot import MixedSIDBenchmarkPlot
 
 
 # TABLE OF CONTENTS:
@@ -107,6 +108,11 @@ def generateRandomSIDSampleSet(
     delete_samples = random.sample(insert_samples, len(insert_samples))
 
     return (search_samples, insert_samples, delete_samples)
+
+
+def generateRandomOperationSequence(size=STOP):
+    """Generates a sequence of random operations according to probabilities set in the global configuration (unless
+    overridden by options passed as arguments). The returned list is compatible with MixedSIDBenchmarkPlot."""
 
 
 # ===================================
@@ -657,6 +663,103 @@ def worstCaseSIDNoBST():
     )
 
 
+def testMixedSIDPlotSizes():
+    """Runs a small test that inserts and deletes between benchmarksexpects known values.
+
+    The operation sequence is as follows:
+        1. Insert up to first benchmark.
+        2. Search through first benchmark.
+        3. Search up to second benchmark.
+        4. Insert through second benchmark.
+        5. Search up to third benchmark.
+        6. Delete through third benchmark.
+        7. Search up to fourth benchmark.
+        8. Insert and delete in equal numbers through fourth benchmark.
+
+    Expected values are thus easily determined, I expect a specific plot in return.
+
+    For simplicity, the operation between benchmarks is always search, so we don't have to simulate it here at all."""
+
+    # Our printed expected values.
+    expected = []
+
+    # Convenience locals
+    s = [(MixedSIDBenchmarkPlot.SEARCH, 0)]
+    i = [(MixedSIDBenchmarkPlot.INSERT, 0)]
+    d = [(MixedSIDBenchmarkPlot.DELETE, 0)]
+
+    # Test parameters
+    bm_start = 4
+    bm_length = 4
+    bm_interval = 8
+
+    # Get us to the first benchmark
+    ops = i * bm_start
+    size = bm_start
+    index = bm_start
+
+    # Run the first simulated benchmark: search.
+    expected.append((index, size))
+    ops += s * bm_length
+    # size does not change.
+
+    # Fast forward
+    index += bm_interval
+    ops += s * (bm_interval - bm_length)
+
+    # Run the second simulated benchmark: insert.
+    expected.append(
+        (index,
+         statistics.median(list(range(
+             size + 1,
+             size + bm_length + 1
+         ))))
+    )
+    ops += i * bm_length
+    size += bm_length
+
+    # Fast forward
+    index += bm_interval
+    ops += s * (bm_interval - bm_length)
+
+    # Run the third simulated benchmark: delete.
+    expected.append(
+        (index,
+         statistics.median(list(range(
+             size - 1,
+             size - bm_length - 1,
+             -1
+         ))))
+    )
+    ops += d * bm_length
+    size -= bm_length
+
+    # Fast forward
+    index += bm_interval
+    ops += s * (bm_interval - bm_length)
+
+    # Run the first simulated benchmark: insert and delete equally.
+    expected += (index, size)
+    ops += (i + d) * (bm_length // 2)
+    # size does not change.
+
+    # Now, run the real simulation.
+    sim_plot = MixedSIDBenchmarkPlot.plotSizes(ops, bm_start, bm_length, bm_interval)
+
+    # And just for kicks, run the actual benchmark on these operations.
+    bst = BinarySearchTree()
+    real_plot = MixedSIDBenchmarkPlot(ops, bst.search, bst.insert, bst.delete, bm_start, bm_length, bm_interval)
+
+    # Print for comparison.
+    print("MixedSIDBenchmarkPlot test:")
+    print("\t operations: " + str(ops))
+    print("\tPlease hand-check that the following match:")
+    print("\t\t" + str(expected))
+    print("\t\t" + str(sim_plot.coordinates))
+    print("\tReal benchmark's output:")
+    print("\t\t" + str(real_plot.coordinates))
+
+
 # ==========================
 # SECTION: Graph invocations
 # ==========================
@@ -672,4 +775,5 @@ def worstCaseSIDNoBST():
 # testRandomSID()
 # randomSID()
 # worstCaseSID()
-worstCaseSIDNoBST()
+# worstCaseSIDNoBST()
+testMixedSIDPlotSizes()

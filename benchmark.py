@@ -483,19 +483,26 @@ def worstCaseSID():
     """Performs a full search, insert, and delete benchmark set on all data structures using the worst-case inputs
     for binary search trees."""
 
+    # Custom test parameters, because a million items will just take eons.
+    stop = 10000
+    bm_start = 500
+    bm_length = 100
+    bm_interval = 500
+
     # Worst-case insert: all increasing.
-    insert_samples = list(range(STOP))
+    insert_samples = list(range(stop))
 
     # Worst-case delete: always the leaf in our worst-case structure.
-    delete_samples = insert_samples[:].reverse()
+    delete_samples = insert_samples[:]
+    delete_samples.reverse()
 
     # Worst-case search: search for the last bm_length elements in our worst-case structure. But this is harder
     # to create since it only does a search at our various intervals.
     search_samples = []
-    current = BENCHMARK_START
-    while current < STOP:
-        search_samples += list(range(current, min(STOP, current + BENCHMARK_LENGTH)))
-        current = min(STOP, current + BENCHMARK_INTERVAL)
+    current = bm_start
+    while current < stop:
+        search_samples += list(range(current - bm_length, current))
+        current = min(stop, current + bm_interval)
 
     # Initialize data structures
     bst = BinarySearchTree()
@@ -511,11 +518,29 @@ def worstCaseSID():
     insert_filename = base_filename[0:-4] + "_insert" + base_filename[-4:]
     delete_filename = base_filename[0:-4] + "_delete" + base_filename[-4:]
     searches = \
-        [bst.search, stromberg_treap.get_key, jenks_treap.__getitem__, pyskiplist.search, redblacktree.find_node]
+        [
+            bst.search,
+            stromberg_treap.get_key,
+            jenks_treap.__getitem__,
+            pyskiplist.search,
+            redblacktree.find_node
+        ]
     inserts = \
-        [bst.insert, stromberg_treap.insert, jenks_treap.insert, pyskiplist.insert, redblacktree.add]
+        [
+            bst.insert,
+            stromberg_treap.insert,
+            jenks_treap.insert,
+            pyskiplist.insert,
+            redblacktree.add
+        ]
     deletes = \
-        [bst.delete, stromberg_treap.remove, jenks_treap.__delitem__, pyskiplist.remove, redblacktree.remove]
+        [
+            bst.delete,
+            stromberg_treap.remove,
+            jenks_treap.__delitem__,
+            pyskiplist.remove,
+            redblacktree.remove
+        ]
     title = "Worst-Case Input"
     graphSID(
         search_filename,
@@ -527,6 +552,10 @@ def worstCaseSID():
         search_samples,
         insert_samples,
         delete_samples,
+        stop,
+        bm_start,
+        bm_length,
+        bm_interval,
         title=title
     )
 

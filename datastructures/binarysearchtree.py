@@ -2,7 +2,7 @@
 
 
 class BinarySearchTree:
-    """A simple, recursive binary tree implementation. Each tree holds pointers to subtrees."""
+    """A simple, iterative binary tree implementation. Each tree holds pointers to subtrees."""
 
     legend_text = "Binary Search Tree"
 
@@ -16,14 +16,46 @@ class BinarySearchTree:
         if self.root is None:
             # Base case: no tree. Insert at root.
             self.root = BinarySearchTree.Node(key)
-        else:
-            self.root.insert(key)
+            return
+
+        # Iterative version of recursive insertion method.
+        current = self.root
+        while True:
+            # Traverse to a leaf.
+            if key < current.key:
+                # Go left.
+                if current.left is None:
+                    # Leaf. Insert here. Base case.
+                    current.left = BinarySearchTree.Node(key)
+                    break
+                else:
+                    # Keep traversing.
+                    current = current.left
+            else:
+                # Go right.
+                if current.right is None:
+                    # Leaf. Insert here. Base case.
+                    current.right = BinarySearchTree.Node(key)
+                    break
+                else:
+                    # Keep traversing.
+                    current = current.right
+
 
     def search(self, key):
         """Retrieves the key from the tree, or None if not present."""
         if self.root is None:
             return None
-        return self.root.search(key)
+
+        current = self.root
+        while current is not None and current.key != key:
+            if key < current.key:
+                current = current.left
+            else:
+                current = current.right
+        if current is None:
+            return None
+        return current.key
 
     def delete(self, key):
         """Deletes the first-found occurrence of Key from the tree, as determined by equality (==).
@@ -40,74 +72,31 @@ class BinarySearchTree:
             return True
 
         # Otherwise, search the tree.
-        return self.root.delete(key)
+        current = self.root
+        while True:
+            if key < current.key:
+                if current.left is None:
+                    return False
+                elif key == current.left.key:
+                    current.left = current.left.replace()
+                    return True
+                else:
+                    current = current.left
+            else:
+                if current.right is None:
+                    return False
+                elif key == current.right.key:
+                    current.right = current.right.replace()
+                    return True
+                else:
+                    current = current.right
+
 
     class Node:
         def __init__(self, key):
             self.left = None
             self.right = None
             self.key = key
-
-        def insert(self, key):
-            """Recursive insertion function to add key to tree. Caller must handle the base case of an empty tree."""
-
-            # Traverse to a leaf.
-            if key < self.key:
-                # Go left.
-                if self.left is None:
-                    # Left is free.
-                    self.left = BinarySearchTree.Node(key)
-                else:
-                    # Left is occupied. Recurse.
-                    self.left.insert(key)
-            else:
-                # Go right.
-                if self.right is None:
-                    # Right is free.
-                    self.right = BinarySearchTree.Node(key)
-                else:
-                    # Right is occupied. Recurse.
-                    self.right.insert(key)
-
-        def search(self, key):
-            """Retrieves the key from the tree, or None if not present."""
-
-            if self.key == key:
-                # Base case: key found.
-                return self.key
-
-            if key < self.key and type(self.left) is BinarySearchTree.Node:
-                # Go left.
-                return self.left.search(key)
-            elif type(self.right) is BinarySearchTree.Node:
-                # Go right.
-                return self.right.search(key)
-            else:
-                # We've fallen out of the tree.
-                return None
-
-        def delete(self, key):
-            """Recursive helper. Caller must ensure that this Node is NOT the Node to remove!"""
-
-            if key < self.key:
-                if self.left is None:
-                    return False
-                if self.left.key == key:
-                    # Delete left.
-                    self.left = self.left.replace()
-                    return True
-                # Else, keep searching.
-                return self.left.delete(key)
-            else:
-                # Search right subtree.
-                if self.right is None:
-                    return False
-                if self.right.key == key:
-                    # Delete right.
-                    self.right = self.right.replace()
-                    return True
-                # Else, keep searching.
-                return self.right.delete(key)
 
         def replace(self):
             """Helper function for deleting Nodes. Prepares this Node's successor and returns it.

@@ -107,8 +107,6 @@ Finally, delete performance is almost entirely flat across all five graphs. It i
 
 The worst-case scenarios for binary search trees are inserting ordered data, deleting the farthest leaf, and searching for the lowest data in the tree. In any of these cases, the worst-case performance is $O(n)$. Since treaps, skiplists, and red-black trees all claim to run in $O(\log n)$ expected time in these scenarioes, these worst-case inputs are the next logical benchmark. To briefly illustrate the performance difference between the binary search tree and all the other data structures, see the mini-graphs with the binary search tree clearly dwarfing the other data structures and performing in linear time. This is expected and needs no further discussion. (Note that for these graphs, the benchmark parameters were adjusted: the normal 180 million overall searches, insertions, and deletions would take unreasonably long and provide no noticeable benefit in terms of graph quality.)
 
-The more interesting graphs appear when the binary search tree is removed from the data set, as appears below. 
-
 \begin{figure}[h]
     \centering
     \input{plots/worstCase_search.tex}
@@ -117,27 +115,39 @@ The more interesting graphs appear when the binary search tree is removed from t
     \caption{Average of 100 operations, benchmarked every 500, starting at 500.}
 \end{figure}
 
+The more interesting graphs appear when the binary search tree is removed from the data set, as appears below. Here, same worst-case inputs for binary search trees create minor challenges for the various data structures, as they cope in their own ways with the ordered input data. By removing the binary search tree, the benchmarks can once again run at their full scales without issue, which already demonstrates their power to cope with difficult input sets.
+
 \input{plots/worstCaseNoBST_search.tex}
+
+The first graph, search, presents a great deal more noise than the randomized input search benchmarks. This, I attribute simply to the challenges and inefficiencies inherent in coping with sorted inputs to these data structures. The specifics are surprising and don't seem to have simple explanations. The two treaps perform almost identically, in contrast with the marked performance difference on search with randomized inputs. This suggests that ordered inputs to insert may cause the trees to develop more similar geometries than random inputs. PySkipList is by far the noisiest on search, which suggests a high degree of unpredictability in its performance, even as it maintains logarithmic complexity overall. Lastly, the red-black tree is consistent but slower than the rest. 
+
+The relative speeds of the three data structures remain unchanged: the treaps are fastest, the skiplist is significantly slower, and the red-black tree is slower still. While these are not provable general statements about the three data structures, they do provide insight into the impact of ordered inputs (to both insert and search) on the performance of searches, which is to say that the data structures are only very modestly affected. Finally, it is worth noting that, compared to search with randomized inputs, the red-black tree and Stromberg treap are both noticeably slower, whereas the Jenks treap and PySkipList remain about the same in their overall speeds.
+
 \input{plots/worstCaseNoBST_insert.tex}
+
+Insert on ordered data presents a more interesting picture still. First, the red-black tree, whose performance on random data sat squarely between the two treaps, is now in last place by a wide margin. This makes sense: sorted input is a worst-case scenario for red-black trees, too, because they will need to rotate almost constantly to maintain balance. Yet, it remains clearly and visibly $O(\log n)$ even in this case---an impressive feat. Being deterministic, it exhibits very smooth worst-case performance, but it is indeed far slower than its randomized counterparts.
+
+The remaining three data structures are plagued by differing levels of noise, but their relative performance is essentially unchanged compared to the randomized input insert benchmark. The most noteworthy aspect of their performance is perhaps the consistency of Jenks relative to Stromberg. While Stromberg straddles the line its randomized benchmark cut, with wide and erratic variations in running time, Jenks is quite consistent.
+
 \input{plots/worstCaseNoBST_delete.tex}
 
-\todo{Add any other input sets discussed here.}
+Delete is much the same story: worst-case but very consistent performance for the red-black tree, while the randomized data structures have some noise but are still relatively consistent. Again, Jenks is much more stable than Stromberg in its running times.
 
+\todo{Add any other input sets discussed here.}
 
 - Randomized
 - Well-known worst case
 - Real-world data sets?
 - Randomized sequence of insertions, searches, and deletes
 - Much larger data sets
+- Compared to B-tree-based sortedlist collection types from sorted collections!!
 
-- Use a single ISDBenchmark class to produce 3 standard benchmarks
-- Update the project files section to describe/list it
-- Update the project files section's description of BenchmarkPlot accordingly
+\section{Conclusions}
+The reality of how slow $O(n)$ can be compared to $O(\log n)$ hit me clearly during the worst-case benchmarking of the binary search tree. In CS 584, we consider any polynomial time algorithm to be feasibly runnable, but for these (admittedly very large) input sizes, even linear brought my very powerful workstation to a grinding halt with a single binary tree benchmark sequence that, under ideal circumstances, had taken about a minute to complete. 
 
-\todo{Finish this section}
+An implementation by Dmitry Sysoev of the textbook's red-black tree algorithm would have made for an even more interesting counterpoint: on insert, with random data, it had proved to be the fastest algorithm. Unfortunately, its deletion method was fatally flawed, partly due to design decisions by the textbook authors that made their algorithm very difficult to implement correctly. I was not able to fix the Sysoev implementation in the time available for this project, so I excluded it from the analysis instead.
 
-\todo{Section: Asymptotic Expectations - talk about expected/average performance. (Talk about it in each subjection.)}
-\newpage
+Overall, the picture these benchmarks paint is clear: both treap implementations are quite fast, Pyskip is relatively slow by comparison, and the red-black tree loses out to the randomized data structures in its worst case (while only tying the treaps in the best). Based on this paper, of the algorithms presented, treaps are the clear winner.
 
 \section{Chosen}
 

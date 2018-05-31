@@ -11,7 +11,7 @@ from datastructures.avltree import BinaryTree as AVLTree
 from datastructures.enether_rbtree import RedBlackTree
 from pgfplot import PgfPlot
 from sidgraphset import SIDGraphSet, SIDBenchmark
-from mixedsidbenchmarkplot import MixedSIDBenchmarkPlot
+from mixedsidgraph import MixedSIDBenchmarkPlot, MixedSIDPgfPlot
 
 
 # TABLE OF CONTENTS:
@@ -47,6 +47,14 @@ SAMPLE_SIZE = STOP - START
 # Constants determining default graph labels. Override in the call to graph() if desired.
 XLABEL = "Number of items in data structure"
 YLABEL = "Running time (seconds)"
+
+# Constants for generating random operation sequences.
+# There should be more inserts than deletes, so the data structure grows over time.
+# The number of searches is less important but should be approximately on par with the other operations.
+# Probabilities are specified in the 1-100 range and should add up to 100.
+INSERT_PROBABILITY = 40
+DELETE_PROBABILITY = 25
+SEARCH_PROBABILITY = 35
 
 
 # =============================
@@ -110,9 +118,78 @@ def generateRandomSIDSampleSet(
     return (search_samples, insert_samples, delete_samples)
 
 
-def generateRandomOperationSequence(size=STOP):
+def generateRandomOperationSequence(
+        size=STOP,
+        pr_search = SEARCH_PROBABILITY,
+        pr_insert = INSERT_PROBABILITY,
+        pr_delete = DELETE_PROBABILITY
+):
     """Generates a sequence of random operations according to probabilities set in the global configuration (unless
-    overridden by options passed as arguments). The returned list is compatible with MixedSIDBenchmarkPlot."""
+    overridden by options passed as arguments). The returned list is compatible with MixedSIDBenchmarkPlot.
+
+    Any rolls that don't make sense will be tossed out, e.g. searching/deleting when the data structure is empty.
+
+    No duplicates will ever be inserted."""
+
+    if pr_search + pr_insert + pr_delete != 100:
+        raise ValueError("The combined probability of search, insert, and delete must be 100.")
+    
+    # List of operations, in order.
+    ops = []
+
+    # Dictionary of items currently in the data structure during simulation.
+    items = {}
+    
+    # Possible items to insert. This will be way too large, probably, but it trivially guarantees that we don't ever
+    # have a problem inserting duplicates, picking items to insert, etc.
+    insert_keys = generateRandomSamples(size)
+    insert_index = 0
+
+    # Create the random set of operations.
+    while len(ops) < size:
+        roll = random.randint(1, 100)
+        
+        if roll <= pr_search:
+            # Search, if we can.
+            if len(items) == 0:
+                # Nothing in the data structure, so we won't search.
+                continue
+            else:
+                # Pick a random item and add it as a search operation.
+                ops.append(
+                    # Format: (operation, key)
+                    (MixedSIDBenchmarkPlot.SEARCH,
+                     random.choice(items.keys()))   # Only choose from items actually IN the data structure right now.
+                )
+                
+        elif roll <= pr_search + pr_insert:
+            # Insert, which we can always do (as long as our data structure isn't large enough to prevent us from
+            # choosing new numbers to insert....)
+            ops.append(
+                # Format: (operation, key)
+                (MixedSIDBenchmarkPlot.INSERT,
+                 insert_keys[insert_index])
+            )
+            insert_index += 1
+        
+        else:
+            # Delete, if we can.
+            if len(items) == 0:
+                # Nothing in the data structure, so we won't delete.
+                continue
+            else:
+                # Pick a random item and add it as a delete operation.
+                to_delete = random.choice(items.keys())
+                ops.append(
+                    # Format: (operation, key)
+                    (MixedSIDBenchmarkPlot.DELETE,
+                     to_delete)
+                )
+
+                # Then, remove that item from our simulated data structure.
+                del items[to_delete]
+
+    return ops
 
 
 # ===================================
@@ -245,6 +322,57 @@ def graphSID(
         )
 
 
+def graphMixedSID(
+        filename,
+        searches,
+        inserts,
+        deletes,
+        operations,
+        bm_startindex=BENCHMARK_START,
+        bm_length=BENCHMARK_LENGTH,
+        bm_interval=BENCHMARK_INTERVAL,
+        xlabel=XLABEL,
+        ylabel=YLABEL,
+        title=""
+):
+    """Creates and runs a SIDGraphSet sequence with the given settings, using the benchmarking constants declared above.
+
+    All parameters are passed to SIDGraphSet(). See that method for documentation. Runs benchmarks synchronously; blocks
+    until the benchmarks are done.
+
+    No return value."""
+
+    if DATA_SETS_TO_PRODUCE > 1:
+        for i in range(1, DATA_SETS_TO_PRODUCE + 1):
+            MixedSIDPgfPlot(
+                filename[0:-4] + str(i) + filename[-4:],
+                searches,
+                inserts,
+                deletes,
+                operations,  # Known internally as samples, same as PgfPlots.
+                bm_startindex,
+                bm_length,
+                bm_interval,
+                xlabel,
+                ylabel,
+                title
+            ).runAndWrite()
+    else:
+        MixedSIDPgfPlot(
+            filename,
+            searches,
+            inserts,
+            deletes,
+            operations,  # Known internally as samples, same as PgfPlots.
+            bm_startindex,
+            bm_length,
+            bm_interval,
+            xlabel,
+            ylabel,
+            title
+        ).runAndWrite()
+
+
 # ==========================
 # SECTION: Graph definitions
 # ==========================
@@ -266,6 +394,7 @@ def testPgfPlot():
         ylabel="TEST Y LABEL",
         title="TEST TITLE",
     )
+
 
 def randomAllMiniscule():
     """Performs a miniscule random data test on ALL data structures under consideration."""
@@ -760,6 +889,63 @@ def testMixedSIDPlotSizes():
     print("\t\t" + str(real_plot.coordinates))
 
 
+def testGraphMixedSID():
+    # Options and parameters
+    size = 20
+    bm_start = 0
+    bm_length = 3
+    bm_interval = 5
+    filename = "plots/testGraphMixedSID.tex"
+
+    # Generate operation sequence
+    ops = generateRandomOperationSequence(size)
+
+    # Initialize data structures
+    bst = BinarySearchTree()
+    stromberg_treap = StrombergTreap()
+    jenks_treap = JenksTreap()
+    pyskiplist = PySkipList()
+    redblacktree = RedBlackTree()
+
+    # Create functions list
+    searches = \
+        [
+            bst.search,
+            stromberg_treap.get_key,
+            jenks_treap.__getitem__,
+            pyskiplist.search,
+            redblacktree.find_node
+        ]
+    inserts = \
+        [
+            bst.insert,
+            stromberg_treap.insert,
+            jenks_treap.insert,
+            pyskiplist.insert,
+            redblacktree.add
+        ]
+    deletes = \
+        [
+            bst.delete,
+            stromberg_treap.remove,
+            jenks_treap.__delitem__,
+            pyskiplist.remove,
+            redblacktree.remove
+        ]
+
+    # Run the graph
+    graphMixedSID(
+        filename,
+        searches,
+        inserts,
+        deletes,
+        ops,
+        bm_start,
+        bm_length,
+        bm_interval
+    )
+
+
 # ==========================
 # SECTION: Graph invocations
 # ==========================
@@ -776,4 +962,5 @@ def testMixedSIDPlotSizes():
 # randomSID()
 # worstCaseSID()
 # worstCaseSIDNoBST()
-testMixedSIDPlotSizes()
+# testMixedSIDPlotSizes()
+testGraphMixedSID()

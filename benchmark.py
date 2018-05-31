@@ -53,8 +53,8 @@ YLABEL = "Running time (seconds)"
 # The number of searches is less important but should be approximately on par with the other operations.
 # Probabilities are specified in the 1-100 range and should add up to 100.
 INSERT_PROBABILITY = 40
-DELETE_PROBABILITY = 25
-SEARCH_PROBABILITY = 35
+DELETE_PROBABILITY = 30
+SEARCH_PROBABILITY = 30
 
 
 # =============================
@@ -131,6 +131,7 @@ def generateRandomOperationSequence(
 
     No duplicates will ever be inserted."""
 
+    print("Generating {} random operations.".format(size))
     if pr_search + pr_insert + pr_delete != 100:
         raise ValueError("The combined probability of search, insert, and delete must be 100.")
     
@@ -145,10 +146,25 @@ def generateRandomOperationSequence(
     insert_keys = generateRandomSamples(size)
     insert_index = 0
 
-    # Create the random set of operations.
-    while len(ops) < size:
-        roll = random.randint(1, 100)
+    # Since Python takes an INSANELY long time to generate lots of random numbers, we'll instaed use the MUCH faster
+    # random.sample, and we'll just use a large enough sample size that it won't matter.
+    def generateRolls():
+        rolls = random.sample(list(range(10000)), 1000)
+        for i in range(len(rolls)):
+            rolls[i] = (rolls[i] % 100) + 1
+        return rolls
+    rolls = generateRolls()
 
+    # Create the random set of operations.
+    attempts = 0
+    while len(ops) < size:
+        # Get the next roll; if rolls is empty, generate a new list.
+        if len(rolls) == 0:
+            rolls = generateRolls()
+        roll = random.choice(rolls)
+        rolls.remove(roll)
+
+        attempts += 1
         if roll <= pr_search:
             # Search, if we can.
             if len(items) == 0:
@@ -190,7 +206,7 @@ def generateRandomOperationSequence(
 
                 # Then, remove that item from our simulated data structure.
                 del items[to_delete]
-    print(str(ops))
+    print("Generating {} operations took {} attempts.".format(size, attempts))
     return ops
 
 
@@ -346,6 +362,7 @@ def graphMixedSID(
 
     if DATA_SETS_TO_PRODUCE > 1:
         for i in range(1, DATA_SETS_TO_PRODUCE + 1):
+            print("Running MixedSIDPgfPlot: {} of {}.".format(i, DATA_SETS_TO_PRODUCE))
             MixedSIDPgfPlot(
                 filename[0:-4] + str(i) + filename[-4:],
                 searches,
@@ -360,6 +377,7 @@ def graphMixedSID(
                 title
             ).runAndWrite()
     else:
+        print("Running MixedSIDPgfPlot.")
         MixedSIDPgfPlot(
             filename,
             searches,
@@ -948,6 +966,56 @@ def testGraphMixedSID():
     )
 
 
+def mixedSID():
+    # Options and parameters
+    filename = "plots/mixedSID.tex"
+
+    # Generate operation sequence
+    ops = generateRandomOperationSequence(STOP)
+
+    # Initialize data structures
+    bst = BinarySearchTree()
+    stromberg_treap = StrombergTreap()
+    jenks_treap = JenksTreap()
+    pyskiplist = PySkipList()
+    redblacktree = RedBlackTree()
+
+    # Create functions list
+    searches = \
+        [
+            bst.search,
+            stromberg_treap.get_key,
+            jenks_treap.__getitem__,
+            pyskiplist.search,
+            redblacktree.find_node
+        ]
+    inserts = \
+        [
+            bst.insert,
+            stromberg_treap.insert,
+            jenks_treap.insert,
+            pyskiplist.insert,
+            redblacktree.add
+        ]
+    deletes = \
+        [
+            bst.delete,
+            stromberg_treap.remove,
+            jenks_treap.__delitem__,
+            pyskiplist.remove,
+            redblacktree.remove
+        ]
+
+    # Run the graph
+    graphMixedSID(
+        filename,
+        searches,
+        inserts,
+        deletes,
+        ops
+    )
+
+
 # ==========================
 # SECTION: Graph invocations
 # ==========================
@@ -965,4 +1033,6 @@ def testGraphMixedSID():
 # worstCaseSID()
 # worstCaseSIDNoBST()
 # testMixedSIDPlotSizes()
-testGraphMixedSID()
+# testGraphMixedSID()
+# generateRandomOperationSequence(200000)
+mixedSID()

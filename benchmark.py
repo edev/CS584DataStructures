@@ -36,7 +36,8 @@ START = 0
 BENCHMARK_START = 100000
 BENCHMARK_LENGTH = 1000
 BENCHMARK_INTERVAL = 20000
-STOP = BENCHMARK_START * 10 + BENCHMARK_LENGTH
+STOP = BENCHMARK_START * 10\
+       + BENCHMARK_LENGTH
 REPEAT = 1
 COMBINE_METHOD = statistics.median
 
@@ -989,7 +990,8 @@ def mixedSID():
     jenks_treap = JenksTreap()
     pyskiplist = PySkipList()
     redblacktree = RedBlackTree()
-
+    sortedlist = SortedList()
+    builtinlist = List()
 
     # Create functions list
     searches = \
@@ -998,7 +1000,9 @@ def mixedSID():
             stromberg_treap.get_key,
             jenks_treap.__getitem__,
             pyskiplist.search,
-            redblacktree.find_node
+            redblacktree.find_node,
+            sortedlist.search,
+            builtinlist.search,
         ]
     inserts = \
         [
@@ -1006,7 +1010,9 @@ def mixedSID():
             stromberg_treap.insert,
             jenks_treap.insert,
             pyskiplist.insert,
-            redblacktree.add
+            redblacktree.add,
+            sortedlist.add,
+            builtinlist.add
         ]
     deletes = \
         [
@@ -1014,7 +1020,9 @@ def mixedSID():
             stromberg_treap.remove,
             jenks_treap.__delitem__,
             pyskiplist.remove,
-            redblacktree.remove
+            redblacktree.remove,
+            sortedlist.remove,
+            builtinlist.remove
         ]
 
     # Run the graph

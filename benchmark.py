@@ -148,7 +148,7 @@ def generateRandomOperationSequence(
     # Create the random set of operations.
     while len(ops) < size:
         roll = random.randint(1, 100)
-        
+
         if roll <= pr_search:
             # Search, if we can.
             if len(items) == 0:
@@ -156,12 +156,13 @@ def generateRandomOperationSequence(
                 continue
             else:
                 # Pick a random item and add it as a search operation.
+                to_search = random.choice(list(items.keys()))
                 ops.append(
                     # Format: (operation, key)
                     (MixedSIDBenchmarkPlot.SEARCH,
-                     random.choice(items.keys()))   # Only choose from items actually IN the data structure right now.
+                     to_search)
                 )
-                
+
         elif roll <= pr_search + pr_insert:
             # Insert, which we can always do (as long as our data structure isn't large enough to prevent us from
             # choosing new numbers to insert....)
@@ -170,8 +171,9 @@ def generateRandomOperationSequence(
                 (MixedSIDBenchmarkPlot.INSERT,
                  insert_keys[insert_index])
             )
+            items[ insert_keys[insert_index] ] = insert_keys[insert_index]
             insert_index += 1
-        
+
         else:
             # Delete, if we can.
             if len(items) == 0:
@@ -179,7 +181,7 @@ def generateRandomOperationSequence(
                 continue
             else:
                 # Pick a random item and add it as a delete operation.
-                to_delete = random.choice(items.keys())
+                to_delete = random.choice(list(items.keys()))
                 ops.append(
                     # Format: (operation, key)
                     (MixedSIDBenchmarkPlot.DELETE,
@@ -188,7 +190,7 @@ def generateRandomOperationSequence(
 
                 # Then, remove that item from our simulated data structure.
                 del items[to_delete]
-
+    print(str(ops))
     return ops
 
 

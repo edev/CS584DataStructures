@@ -9,6 +9,8 @@ from datastructures.pyskiplist.skiplist import SkipList as PySkipList
 # from datastructures.redblacktree import RedBlackTree
 from datastructures.avltree import BinaryTree as AVLTree
 from datastructures.enether_rbtree import RedBlackTree
+from datastructures.sortedlist import SortedList
+from datastructures.list import List
 from pgfplot import PgfPlot
 from sidgraphset import SIDGraphSet, SIDBenchmark
 from mixedsidgraph import MixedSIDBenchmarkPlot, MixedSIDPgfPlot
@@ -926,6 +928,8 @@ def testGraphMixedSID():
     jenks_treap = JenksTreap()
     pyskiplist = PySkipList()
     redblacktree = RedBlackTree()
+    sortedlist = SortedList()
+    builtinlist = List()
 
     # Create functions list
     searches = \
@@ -934,7 +938,9 @@ def testGraphMixedSID():
             stromberg_treap.get_key,
             jenks_treap.__getitem__,
             pyskiplist.search,
-            redblacktree.find_node
+            redblacktree.find_node,
+            sortedlist.search,
+            builtinlist.search,
         ]
     inserts = \
         [
@@ -942,7 +948,9 @@ def testGraphMixedSID():
             stromberg_treap.insert,
             jenks_treap.insert,
             pyskiplist.insert,
-            redblacktree.add
+            redblacktree.add,
+            sortedlist.add,
+            builtinlist.add
         ]
     deletes = \
         [
@@ -950,7 +958,9 @@ def testGraphMixedSID():
             stromberg_treap.remove,
             jenks_treap.__delitem__,
             pyskiplist.remove,
-            redblacktree.remove
+            redblacktree.remove,
+            sortedlist.remove,
+            builtinlist.remove
         ]
 
     # Run the graph
@@ -979,6 +989,7 @@ def mixedSID():
     jenks_treap = JenksTreap()
     pyskiplist = PySkipList()
     redblacktree = RedBlackTree()
+
 
     # Create functions list
     searches = \

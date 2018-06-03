@@ -70,17 +70,15 @@
 %    		\addlegendentry{Data Structure Size}
 %        \end{axis}
         \begin{axis}[
-            scale only axis,
             xmin=100000, xmax=1000000,
             ymin=0.0000025, ymax=0.0000225,
             xlabel={Number of items in data structure},
             ylabel={Running time (seconds)},
             ytick pos=left,
             title={Random sequence of inserts, searches, and deletes},
-            width=0.7\textwidth,
+            width=0.65\textwidth,
             height=2in,
             legend pos=outer north east,
-            legend style={cells={align=left}}
         ]
     		\addplot coordinates {
     			(100000, 5.151302959802706e-06)

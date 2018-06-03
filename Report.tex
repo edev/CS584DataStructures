@@ -96,14 +96,58 @@ Comparing the Stromberg and Jenks treaps, the latter appears to be two or three 
 \section{Choosing Inputs \& Benchmarks}
 The remainder of this paper examines the above implementations' performance on the insert, search, and delete operations with large data sets ($10^6$ or larger). The two essential cases are randomized input and ordered input (the binary search tree's worst-case input). Beyond these, I will add as many more novel configurations as space allows.
 
-The SIDGraphSet and SIDBenchmark classes in sidgraphset.py perform the first two benchmark sets\todo{update this}. Their sequence, in short, is to perform insertions up to each data point, benchmark searches on selected elements that have already been inserted, benchmark insertions, and repeat. Once all insertions are complete, the sequence continues with deletions: SIDBenchmark will delete elements until it reaches the last graph point plus the sample size, benchmark deletions to the graph plot point, and continue in this way until it benchmarks the first plot point. \todo{Update this to reflect any additional benchmarks.}
+The SIDGraphSet and SIDBenchmark classes in sidgraphset.py perform the first two benchmark sets. Their sequence, in short, is to perform insertions up to each data point, benchmark a number of searches on selected elements that have already been inserted, benchmark a number of insertions, and repeat. Once all insertions are complete, the sequence continues with deletions: SIDBenchmark will delete elements until it reaches the last graph point plus the sample size, benchmark deletions down to the graph plot point, and repeat this cycle until it benchmarks the first plot point.
+
+The SIDBenchmark class implements this benchmark sequence, and the SIDGraphSet class collates the three plots (search, insert, and delete) of a set of SIDBenchmarks into three final graphs. The full pseudocode for the SIDBenchmark sequence is below, updated for presentation here, along with opening notes copied from the source comments.
+
+\begin{Verbatim}
+Instantiates a Plot containing the results of a full suite of search, insert, and
+delete benchmarks. Runs these benchmarks immediately and synchronously. Saves the
+results as instance variables. Note that this benchmark differs substantially from
+BenchmarkPlot, even though its interface is similar!
+
+The benchmark accepts 3 sample sets and maintain 3 indices: one apiece for search,
+index, and delete. The data structure on which search, insert, and delete are called is
+presumed to be empty prior to this benchmark; the plot points count from 0 elements.
+Each index starts at 0.
+
+The sample sets should have the following minimum sizes:
+    len(search_samples) >= the number of searches requested 
+        (likely bm_length times some integer)
+    len(insert_samples) >= stop
+    len(delete_samples) >= stop
+
+0. Set next_benchmark as bm_start.
+1. Call insert on the items in insert_samples with indices [0, bm_start).
+2. While insert_index < stop:
+    a. Set last_benchmark as next_benchmark.
+    b. Set next_benchmark as min(next_benchmark + bm_interval, stop).
+    c. Benchmark: time bm_length searches on items in search_samples[search_index],
+       incrementing search_index each time. Divide the total time by bm_length 
+       and save (data structure size, time) as a plot point for insert.
+    d. Benchmark: time bm_length inserts on items in insert_samples[insert_index],
+       incrementing insert_index each time. Divide the total time by bm_length 
+       and save (data structure size before timed insertions, time) as a plot point
+       for insert.
+    e. Insert subsequent items from insert_samples, incrementing insert_index, until
+       insert_index == next_benchmark. These insertions are not timed.
+3. Set next_benchmark = last_benchmark + bm_length.
+4. While data structure size > bm_start:
+    a. Delete items from delete_samples[delete_index], decrementing delete_index,
+       until data structure size == next_benchmark.
+    b. Benchmark: time bm_length deletions on items in delete_samples[delete_index],
+       decrementing delete_index each time. Divide the total time by bm_length 
+       and save (data structure size after timed deletions, time) as a plot point
+       for delete.
+    c. Decrease next_benchmark by bm_interval.
+\end{Verbatim}
 
 \section{Benchmarks: Randomized Inputs}
 Random inputs are, of course, the best-case scenario for binary search tree insertions. The other data structures should perform well on randomized inputs, too. As a result, this benchmark serves as a useful baseline for later comparisons. The average-case asymptotic performance for all four data structures is $O(\log n)$, and I expect this performance from all five implementations with this input set.
 
 \input{plots/random_search.tex}
 
-Search is perhaps the most interesting graph, because, surprisingly, the graphs of the five plots all curve to plausibly match the graph of $c \cdot \log n$ for various constant multiples $c$. Clearly, all five do in fact work in logarithmic time! (Author's note: very cool!) Both treaps are the clear winners for search. PySkipList, the slowest implementation in the small data set benchmark above, is neck-and-neck with the binary search tree. Finally, the red-black tree, the second-fastest on insertion in the small data set benchmark, is the standout slowest here.
+Search is perhaps the most interesting graph, because, surprisingly, the graphs of the five plots all curve to plausibly match the graph of $c \cdot \log n$ for various constant multiples $c$. Clearly, all five do in fact work in logarithmic time! Both treaps are the clear winners for search. PySkipList, the slowest implementation in the small data set benchmark above, is neck-and-neck with the binary search tree. Finally, the red-black tree, the second-fastest on insertion in the small data set benchmark, is the standout slowest here.
 
 \input{plots/random_insert.tex}
 
@@ -161,7 +205,7 @@ Looking back briefly at the random input benchmarks for search, insert, and dele
 
 In practice, SortedList does appear to be a highly competitive data structure. It undeniably bests all but the binary search tree in this test. Were I to continue testing, I would wish to investigate SortedList's worst-case performance, however. It will very likely suffer under one of the same worst-case input as binary search trees, reverse-sorted input data: it will presumably copy all the data in the target list on every insert. Unlike the binary search tree, however, SortedList is designed so that its worst-case behavior is highly optimized on modern hardware. My open question: how much will hardware optimization (SIMD instructions, caching, and so on) cushion SortedList's performance hit in this worst-case?
 
-\section{Conclusions}
+\section{Concluding Remarks}
 The reality of how slow $O(n)$ can be compared to $O(\log n)$ hit me clearly during the worst-case benchmarking of the binary search tree. In CS 584, we consider any polynomial time algorithm to be feasibly runnable, but for these (admittedly very large) input sizes, even linear-time algorithms brought my very powerful workstation to a grinding halt with a single binary tree benchmark sequence that, under ideal circumstances, had taken about a minute to complete. In reflecting on this---which I had ample time to do during a two-hour, worst-case benchmark involving Python's beloved built-in lists---I recognized that by inserting $n$ items into data structures, I was effectively multiplying their theoretical complexity by $n$. This explains why the blazingly-fast $O(\log n)$ operations nonetheless took around a minute to complete. It further explains why going from $10^-5$ to $10^-3$ seconds for a given operation increased my overall benchmarking time by a factor of 30 or more - a frustrating reality I had to manage throughout my testing. In effect, my worst-case tests had time complexity $O(n^2)$ with $n = 1,000,000$.
 
 I find all of the above results interesting for academic purposes and for certain applications. However, I can't ignore the 11 idle logical cores on my CPU during each of the benchmarks I ran! There is a place for single-threaded data structures, to be sure, but I would very much like to explore these same questions using data structures or methods that would allow me to more fully utilize the actual computational power of my hardware to more quickly solve the tasks at hand.

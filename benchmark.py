@@ -991,7 +991,7 @@ def mixedSID():
     pyskiplist = PySkipList()
     redblacktree = RedBlackTree()
     sortedlist = SortedList()
-    builtinlist = List()
+    # builtinlist = List()
 
     # Create functions list
     searches = \
@@ -1002,7 +1002,7 @@ def mixedSID():
             pyskiplist.search,
             redblacktree.find_node,
             sortedlist.search,
-            builtinlist.search,
+            # builtinlist.search,
         ]
     inserts = \
         [
@@ -1012,7 +1012,7 @@ def mixedSID():
             pyskiplist.insert,
             redblacktree.add,
             sortedlist.add,
-            builtinlist.add
+            # builtinlist.add
         ]
     deletes = \
         [
@@ -1022,7 +1022,7 @@ def mixedSID():
             pyskiplist.remove,
             redblacktree.remove,
             sortedlist.remove,
-            builtinlist.remove
+            # builtinlist.remove
         ]
 
     # Run the graph
@@ -1054,4 +1054,4 @@ def mixedSID():
 # testMixedSIDPlotSizes()
 # testGraphMixedSID()
 # generateRandomOperationSequence(200000)
-mixedSID()
+# mixedSID()

@@ -90,7 +90,7 @@ class MixedSIDPgfPlot(PgfPlot):
 
 
 class MixedSIDBenchmarkPlot(Plot):
-    """A collection of static methods for performing a sequence of operations of diverse types, reading instructions
+    """Performs a sequence of operations of diverse types, reading instructions
     from an input list, and generating benchmarks from them.
 
     For all functions, the operations list follows the same format. It is a list of pairs, (o, key) where o is

@@ -179,9 +179,9 @@ class SIDBenchmark:
                     insert_index == next_benchmark. These insertions are not timed.
             3. Set next_benchmark = last_benchmark + bm_length.
             4. While data structure size > bm_start:
-                a. Delete items from delete_samples[delete_index], incrementing delete_index, until
+                a. Delete items from delete_samples[delete_index], decrementing delete_index, until
                     data structure size == next_benchmark.
-                b. Benchmark: time bm_length deletions on items in delete_samples[delete_index], incrementing
+                b. Benchmark: time bm_length deletions on items in delete_samples[delete_index], decrementing
                     delete_index each time. Divide the total time by bm_length and save
                     (data structure size after timed deletions, time) as a plot point for delete.
                 c. Decrease next_benchmark by bm_interval.

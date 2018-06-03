@@ -2,14 +2,21 @@
     \centering
     \begin{tikzpicture}
         \begin{axis}[
+            title={Insert: Worst-Case Input},
+            xmin=100000, xmax=1000000,
+            ymin=0, ymax=0.000025,
             xlabel={Number of items in data structure},
             ylabel={Running time (seconds)},
-            title={Insert: Worst-Case Input},
-            width=0.7\textwidth,
+            width=0.65\textwidth,
             height=2in,
-            legend pos=outer north east
+            legend pos=outer north east,
         ]
-		\addplot coordinates {
+		% Stromberg treap
+		\addplot[
+		    color=blue,
+		    mark=*,
+	    ]
+		coordinates {
 			(100000, 7.761288428090623e-06)
 			(120000, 8.494349197744194e-06)
 			(140000, 1.0177015804175793e-05)
@@ -57,7 +64,12 @@
 			(980000, 9.49003486104516e-06)
 			(1000000, 1.020803686385996e-05)
 		};
-		\addplot coordinates {
+		% Jenks treap
+		\addplot[
+		    color=green,
+		    mark=*,
+	    ]
+		coordinates {
 			(100000, 6.048203112648309e-06)
 			(120000, 6.441538102443189e-06)
 			(140000, 5.797324057132514e-06)
@@ -105,7 +117,12 @@
 			(980000, 6.575259951961954e-06)
 			(1000000, 6.2042119370850915e-06)
 		};
-		\addplot coordinates {
+		% PySkipList
+		\addplot[
+		    color=orange,
+		    mark=*,
+	    ]
+        coordinates {
 			(100000, 1.4357931828961057e-05)
 			(120000, 1.2862295106653932e-05)
 			(140000, 1.2569853854667912e-05)
@@ -153,7 +170,12 @@
 			(980000, 1.6430319321152355e-05)
 			(1000000, 1.724770918509222e-05)
 		};
-		\addplot coordinates {
+		% Red-black tree
+		\addplot[
+		    color=red, 
+		    mark=*,
+	    ]
+	    coordinates {
 			(100000, 1.825032188114051e-05)
 			(120000, 1.8234961938965455e-05)
 			(140000, 1.864968037767767e-05)

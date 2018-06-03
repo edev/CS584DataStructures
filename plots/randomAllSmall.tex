@@ -2,14 +2,21 @@
     \centering
     \begin{tikzpicture}
         \begin{axis}[
+            title={Insert: All Data Structures, Random Input (Small Data Set)},
+            xmin=200, xmax=5000,
+            ymin=-0.000001, ymax=0.00003,
             xlabel={Number of items in data structure},
             ylabel={Running time (seconds)},
-            title={Insert: All Data Structures, Random Input (Small Data Set)},
-            width=0.7\textwidth,
+            width=0.65\textwidth,
             height=2in,
-            legend pos=outer north east
+            legend pos=outer north east,
         ]
-		\addplot coordinates {
+        % BST
+		\addplot[
+		    color=violet,
+		    mark=*,
+	    ]
+	    coordinates {
 			(200, 5.933154134041274e-06)
 			(400, 6.324682071845444e-06)
 			(600, 5.662096330993905e-06)
@@ -36,7 +43,12 @@
 			(4800, 6.264447004422635e-06)
 			(5000, 6.7915038437504904e-06)
 		};
-		\addplot coordinates {
+		% Stromberg treap
+		\addplot[
+		    color=blue,
+		    mark=*,
+	    ]
+		coordinates {
 			(200, 7.137855480987554e-06)
 			(400, 7.664912320315409e-06)
 			(600, 7.5896184861257154e-06)
@@ -63,7 +75,12 @@
 			(4800, 7.920911356595894e-06)
 			(5000, 7.092679180509265e-06)
 		};
-		\addplot coordinates {
+		% Jenks treap
+		\addplot[
+		    color=green,
+		    mark=*,
+	    ]
+		coordinates {
 			(200, 3.915279377775249e-06)
 			(400, 4.4423362171031044e-06)
 			(600, 4.0658670461546365e-06)
@@ -90,7 +107,12 @@
 			(4800, 3.960455678253538e-06)
 			(5000, 3.990573211964943e-06)
 		};
-		\addplot coordinates {
+		% PySkipList
+		\addplot[
+		    color=orange,
+		    mark=*,
+	    ]
+         coordinates {
 			(200, 2.2994736960946228e-05)
 			(400, 2.147380151038547e-05)
 			(600, 2.261826778999776e-05)
@@ -117,7 +139,12 @@
 			(4800, 2.3777792836554566e-05)
 			(5000, 2.3250735997226712e-05)
 		};
-		\addplot coordinates {
+		% Red-black tree
+		\addplot[
+		    color=red, 
+		    mark=*,
+	    ]
+	    coordinates {
 			(200, 3.915279377775249e-06)
 			(400, 4.351983616057708e-06)
 			(600, 4.894099222241266e-06)

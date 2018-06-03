@@ -2,13 +2,14 @@
 \usepackage{amsmath,amssymb,amsthm,enumitem} % Some standard math packages.
 \usepackage{titling} % Enables \setlength{\droptitle}
 \usepackage{parskip} % Cleaner paragraph display
-\usepackage[margin=1in]{geometry} % Adjusts margins.
+\usepackage[margin=0.75in]{geometry} % Adjusts margins.
 \usepackage[utf8]{inputenc} % USe UTF-8 input encoding instead of default ASCII.
 \usepackage[]{forest} % Draws trees.
 \usepackage{fancyvrb} % Allows Verbatim sections with line numbers and such. Note the capital V.
 \usepackage{pgfplots} % For drawing graphs
 \usepackage{hyperref} % For hyperlinks
 \usepackage{subcaption} % For subfigure environment
+\usepackage{placeins} % For \FloatBarrier
 \newcommand {\todo}[1] {{\textbf{\color{red}#1}}}
 
 % Global graph options
@@ -26,38 +27,42 @@
 \begin{document}
 \maketitle
 
-\paragraph{Project topic} I will implement a variety of data structures that maintain total orders on their data, e.g. 2-3 trees, treaps, and skip lists; I will choose at least one deterministic structure as a reference and at least one randomized data structure for comparison. I will experimentally evaluate the rates of growth of their runAndWrite times for insertions, searches, and deletions. Based on these data, I will discuss how the performance I observe compares to the predicted asymptotic performance.
+% \paragraph{Project topic} I will implement a variety of data structures that maintain total orders on their data, e.g. 2-3 trees, treaps, and skip lists; I will choose at least one deterministic structure as a reference and at least one randomized data structure for comparison. I will experimentally evaluate the rates of growth of their runAndWrite times for insertions, searches, and deletions. Based on these data, I will discuss how the performance I observe compares to the predicted asymptotic performance.
 
 \section{Introduction}
-This paper aims to illuminate various facets of the relationship between asymptotic complexity and empirical performance of a range of related data structures. The vehicle for this exploration is a series of benchmarks of data structures that perform similar jobs in very different ways. These include binary search trees, treaps, skip lists, and red-black trees \todo{ADD ANY NEW DATA STRUCTURES HERE}. For many tasks, they have the same asymptotic complexity, e.g. average complexity of $O(\log n)$ for search, insert, and delete operations, with worst-case complexity of $O(n)$ for each. However, the binary search tree in particular has well-known best- and worst-case inputs. Balanced trees like the red-black tree are designed to mitigate these worst-case input scenarios by ensuring a balanced tree structure. The randomized treap and skip list data structures, on the other hand, rely on different randomization techniques to maintain fast expected performance with a tree and a list structure, respectively. These different approaches to potential worst-case inputs will make for interesting comparisons across the board. This paper examines the performance characteristics of each data structure through careful benchmarks and asks how comparable the performance characteristics of these asymptotically equivalent data structures really are.
+This paper aims to illuminate various facets of the relationship between asymptotic complexity and empirical performance of a range of related data structures. The vehicle for this exploration is a series of benchmarks of data structures that perform similar jobs in very different ways. These include binary search trees, treaps, skip lists, and red-black trees. For many tasks, these data structures have the same asymptotic complexity, e.g. average complexity of $O(\log n)$ for search, insert, and delete operations, with some data structures having worst-case complexity of $O(n)$ for each. 
+
+The binary search tree in particular has well-known best- and worst-case inputs. Balanced trees like the red-black tree are designed to mitigate these worst-case input scenarios by ensuring a balanced tree structure. The randomized treap and skip list data structures, on the other hand, rely on different randomization techniques to maintain fast expected performance with a tree and a list structure, respectively. These different approaches to potential worst-case inputs will make for interesting comparisons across the board. This paper examines the performance characteristics of each data structure through careful benchmarks and asks how comparable the performance characteristics of these asymptotically equivalent data structures really are.
 
 \section{Testing Methodology}
-Gathering reliable data is, of course, of paramount importance to any data-based analysis. Since the analysis in this paper is based on benchmark data, the accuracy of the analysis hinges on the accuracy of the benchmarks themselves. The benchmarks included in this paper utilize the following measures to help ensure their accuracy:
+Since the analysis in this paper is based on benchmark data, the accuracy of the analysis hinges on the accuracy of the benchmarks themselves. The benchmarks included in this paper utilize the following measures to help ensure their accuracy:
 
 \begin{itemize}
-    \item To minimize the impact of timer error, CPU load spikes, and so on, each data point is the average running time of a large number of operations $k$, where $k \geq 100$.
-    \item To minimize the impact of such large values of $k$, the overall sample sizes are suitably large, such that $n \geq 100 \cdot k$, where $n$ is the size of a data structure when the $k$ timed operations begin. In other words, the number of operations being timed is no larger than 1\% of the overall data structure at any point.
-    \item When necessary for accuracy, multiple passes may be combined by taking the median or mean time of the running times for each value of $n$ being plotted.
-    \item Since these benchmarks are highly sensitive to fluctuating operating conditions (e.g. CPU scheduling, RAM availability, and Python interpreter behavior), each benchmark produces multiple graphs. The most representative graph among the set is chosen for inclusion in this paper.
-    \item To prevent human error in transcribing graphs or plot data, all graphs are generated programmatically using the same function and included without modification (except to specify each graph's placement and size).
-    \item All tests are performed on the same computer, an Intel i7-4930k with 16 GB of DDR3 running at 2133 MHz. The CPU is water-cooled to prevent thermal throttling and overclocked beyond its Turbo frequency, which should further stabilize the benchmark results.
+    \item To minimize the impact of timer error, CPU load spikes, and so on, each data point is the average running time of a large number of operations $k$, where $k \geq 1,000$.
+    \item The difference in running times between the first and $k$th insert or delete operations can skew the benchmark results as well. To minimize the impact of such large values of $k$, the overall sample sizes are suitably large, such that $n \geq 100 \cdot k$, where $n$ is the size of a data structure when the $k$ timed operations begin. In other words, the number of operations being timed is no larger than 1\% of the overall data structure at any point.
+    \item When necessary for accuracy, a benchmark may be repeated multiple times, and the results may be combined by taking the median or mean of the running times for each value of $n$ being plotted.
+    \item Since these benchmarks are highly sensitive to fluctuating operating conditions (e.g. CPU scheduling, RAM availability, and Python interpreter behavior), each benchmark sequence is re-run to produce multiple graphs. The most representative graph among the set is chosen for inclusion in this paper.
+    \item To prevent human error in transcribing graphs or plot data, all graphs are generated programmatically using the same functions and included without modification (except to specify each graph's presentation in the report).
+    \item All tests are performed on the same computer, an Intel i7-4930k with 16 GB of DDR3 running at 2133 MHz. The CPU is overclocked beyond its Turbo frequency, which should further stabilize the benchmark results.
     \item Random samples are chosen by shuffling integers in the range [0, $n$), where $n$ is the number of samples required. This prevents repeated values, which means that there are no repeated keys within any data structure. This is important for benchmarking searches and deletes, since they will act on the first matching key they find: multiple keys would skew these benchmarks in potentially unpredictable ways.
 \end{itemize}
 
 Because the data structure implementations considered vary widely in their handling of potential error conditions, the inputs are carefully sanitized. In particular, no test will insert an element that already exists in the data structure, search for an element that is not present in the data structure, or delete an element that is not the data structure. This is particularly important since some implementations raise exceptions in these cases, and catching these exceptions would very likely skew the resulting benchmarks.
 
 \section{Project Files}
-The Python 3 implementations included with this report are structured as follows:
+The Python 3 code included with this report is structured as follows:
 \begin{itemize}
-    \item datastructures/ --- contains the implementations of data structures benchmarked below, one per file.
-    \item plots/ --- contains the output \LaTeX \ figures that the benchmark system produces, ready to \\include.
-    \item pgfplot.py --- contains the PgfPlot class, which represents one \LaTeX \ figure to be produced. This class receives and stores all parameters that affect the figure, including plots to be produced.
-    \item plot.py --- contains the Plot and BenchmarkPlot classes, which represent plots in a PGFPLOT graph. The Plot class may be used to produce arbitrary plots, whereas the BenchmarkPlot class receives benchmark parameters for one function and produces the corresponding plot.
-    \item benchmark.py --- sets up and runs the benchmarks used in this document by creating PgfPlot objects and running them.
-    \todo{Update me: pfgplot, plot, sidwhatever, ...}
+    \item datastructures/ --- contains the implementations of data structures benchmarked below, one per file, as well as some that were cut from the benchmarks.
+    \item plots/ --- contains the output \LaTeX \ figures that the benchmark system produces, ready to \textbackslash include.
+    \item pgfplot.py --- contains the PgfPlot class, which represents one \LaTeX \ figure to be produced. This class receives and stores parameters that affect the figure, including plots to be produced.
+    \item plot.py --- contains the Plot and BenchmarkPlot classes, which represent plots in a PGFPLOT graph. The Plot base class may be used to produce arbitrary plots, whereas the BenchmarkPlot subclass receives benchmark parameters for one function and produces a corresponding plot.
+    \item sidgraphset.py --- contains the SIDGraphSet and SIDBenchmark classes. The SIDBenchmark class performs a sequence of search, insert, and delete operations on one data structure, producing three corresponding plots. The SIDGraphSet class coordinates a set of data structures, producing a SIDBenchmark for each one and collating the results into three PgfPlots.
+    \item mixedsidgraph.py --- contains the MixedSIDPgfPlot and MixedSIDBenchmarkPlot classes. The MixedSIDBenchmarkPlot class performs a sequence of search, insert, and delete operations for one data structure, as specified by the input parameters and produces, one plot of the results. The MixedSIDPgfPlot class runs a MixedSIDBenchmarkPlot for each data structure it is given and produces a PgfPlot of the results.
+    \item benchmark.py --- sets up and runs the benchmarks used in this document. See its table of contents for details.
+    \item report.tex --- the \LaTeX \ used to produce this report.
 \end{itemize}
 
-To run custom benchmarks, simply follow the examples in benchmark.py. All classes are thoroughly documented and commented.
+The repository should be readily runnable in PyCharm 2018.1 with Python 3. To run custom benchmarks, simply follow the examples in benchmark.py. All classes are thoroughly documented and commented.
 
 \section{Data Structure Implementations}
 The data structures in question are well-known, so many implementations exist. This paper examines the data structure implementations below, marked by the files or subfolders they occupy within datastructures/ in the project files. All credit for each implementation goes to the author of that implementation. All data structures used are cited here. Modifications are annotated in source comments.
@@ -68,14 +73,16 @@ The data structures in question are well-known, so many implementations exist. T
     \item stromberg\_treap.py --- Credit: Dan Stromberg. Modified from \url{https://pypi.org/project/treap/}.
     \item jenks\_treap.py --- Credit: Grant Jenks. Modified from \url{http://www.grantjenks.com/wiki/random/python_treap_implementation}. Converted from Python 2 to Python 3.
     \item pyskiplist/ --- Credit: Geert Jansen. Modified from \url{https://pypi.org/project/pyskiplist/}.
-    % \item redblacktree.py --- Credit: Dmitry Sysoev. Modified from \url{https://github.com/dsysoev/fun-with-algorithms/blob/master/trees/redblacktree.py}.
+    \item redblacktree.py --- Credit: Dmitry Sysoev. Modified from \url{https://github.com/dsysoev/fun-with-algorithms/blob/master/trees/redblacktree.py}. (Excluded from benchmarks.)
     % Sysoev has been excluded because, after a full DAY trying to fix his implementation of the book's RBT bullshit, I am just in more trouble than when I began.
-    % \item avltree.py --- Credit: marehr. Modified from \url{https://github.com/marehr/binary-tree}.
-    % marehr has been excluded because a quick look at how it uses the Name field (and neglects it in the remove method!!!!) reveals the cause of its RUNTIME EXCEPTIONS in using its unnecessarily complex NodeKey system that tries to compare internally-created None-values to user-inputted Names. UGH. "Extremely well-tested" my ass!
-    \item enether\_rbtree.py --- Credit: Stanislav Kozlovski. 
+    \item avltree.py --- Credit: marehr. Modified from \url{https://github.com/marehr/binary-tree}. (Excluded from benchmarks.)
+    % marehr has been excluded because a quick look at how it uses the Name field (and neglects it in the remove method!!!!) reveals the cause of its runtime exceptions: in using its unnecessarily complex NodeKey system, it tries to compare internally-created None-values to user-inputted Names.
+    \item enether\_rbtree.py --- Credit: Stanislav Kozlovski. Modified from \url{https://github.com/Enether/Red-Black-Tree}.
+    \item sortedlist.py --- Credit: Grant Jenks. Modified from \url{http://www.grantjenks.com/docs/sortedcontainers/}.
+    \item list.py --- wrapper around the built-in list data type.
 \end{itemize}
 
-The above data structures have been modified as needed to standardize their interfaces for insert, search, and delete operations.
+The above data structures have been modified as needed to standardize their interfaces for insert, search, and delete operations and to add \verb|legend_text| class data members to assist with automated legend creation.
 
 \section{Choosing Implementations to Test}
 
@@ -117,12 +124,14 @@ The sample sets should have the following minimum sizes:
     len(insert_samples) >= stop
     len(delete_samples) >= stop
 
+SIDBenchmark(search, insert, delete, search_samples, insert_samples, delete_samples,
+             stop, bm_start, bm_length, bm_interval):
 0. Set next_benchmark as bm_start.
 1. Call insert on the items in insert_samples with indices [0, bm_start).
 2. While insert_index < stop:
     a. Set last_benchmark as next_benchmark.
     b. Set next_benchmark as min(next_benchmark + bm_interval, stop).
-    c. Benchmark: time bm_length searches on items in search_samples[search_index],
+    c. Benchmark: time bm_length search calls on items in search_samples[search_index],
        incrementing search_index each time. Divide the total time by bm_length 
        and save (data structure size, time) as a plot point for insert.
     d. Benchmark: time bm_length inserts on items in insert_samples[insert_index],
@@ -143,73 +152,75 @@ The sample sets should have the following minimum sizes:
 \end{Verbatim}
 
 \section{Benchmarks: Randomized Inputs}
-Random inputs are, of course, the best-case scenario for binary search tree insertions. The other data structures should perform well on randomized inputs, too. As a result, this benchmark serves as a useful baseline for later comparisons. The average-case asymptotic performance for all four data structures is $O(\log n)$, and I expect this performance from all five implementations with this input set.
+Random inputs are, of course, the best-case scenario for binary search tree insertions. The other data structures should perform well on randomized inputs, too. As a result, this benchmark serves as a useful baseline for later comparisons. The average-case asymptotic performance for all four data structures is $O(\log n)$ for search, insert, and delete, and I expect the benchmarks to reflect this time complexity on all five implementations with this input set.
+
+Search (Figure \ref{fig:random_search}) is perhaps the most interesting graph, because, surprisingly, all five plots curve to plausibly match the graph of $c \log n$ for various constant multiples $c$. Clearly, all five do in fact work in logarithmic time! Both treaps are the clear winners for search. PySkipList, the slowest implementation in the small data set benchmark above, is neck-and-neck with the binary search tree. Finally, the red-black tree, the second-fastest on insertion in the small data set benchmark, is the standout slowest here.
 
 \input{plots/random_search.tex}
 
-Search is perhaps the most interesting graph, because, surprisingly, the graphs of the five plots all curve to plausibly match the graph of $c \cdot \log n$ for various constant multiples $c$. Clearly, all five do in fact work in logarithmic time! Both treaps are the clear winners for search. PySkipList, the slowest implementation in the small data set benchmark above, is neck-and-neck with the binary search tree. Finally, the red-black tree, the second-fastest on insertion in the small data set benchmark, is the standout slowest here.
+Next up is insertion (Figure \ref{fig:random_insert}). Here, the logarithmic graph is faintly visible at best. Compared to the small data set insertion benchmark, almost everything is the same: the treaps and red-black tree are all tightly grouped, and PySkipList takes about twice as long as the rest. However, in this best-case input for the binary search tree, it does indeed pull ahead of the pack.
 
 \input{plots/random_insert.tex}
 
-Next up is insertion. Here, the logarithmic graph is faintly visible at best. The most telling is perhaps the binary search tree, whose running time approximately doubles from $10^5$ elements to $10^6$ elements, in keeping with a logarithmic rate of growth.  In comparison to the small data set insertion benchmark, almost everything is the same: the treaps and red-black tree are all tightly grouped, and PySkipList takes about twice as long as the rest. However, in this best-case input for the binary search tree, it does indeed pull ahead of the pack.
+Finally, delete performance (Figure \ref{fig:random_delete}) is almost entirely flat across all five graphs. It is stratified into two groups. On closer inspection, these are easily explained. Binary search trees and treaps both enjoy relatively simple insertions and deletions, whereas red-black trees and skip lists may require much more work for both.
 
 \input{plots/random_delete.tex}
-
-Finally, delete performance is almost entirely flat across all five graphs. It is stratified into two groups, but on closer inspection, these are easily explained. Binary search trees and treaps both enjoy relatively simple insertions and deletions, whereas red-black trees and skip lists \todo{confirm this} may require much more work for both.
+\FloatBarrier % Please put the graphs before the new section!!
 
 \section{Benchmarks: Ordered Inputs}
 
-The worst-case scenarios for binary search trees are inserting ordered data, deleting the farthest leaf, and searching for the farthest leaf in the tree. In any of these cases, the worst-case performance is $O(n)$. Since treaps, skiplists, and red-black trees all claim to run in $O(\log n)$ expected time in these scenarioes, these worst-case inputs are the next logical benchmark. To briefly illustrate the performance difference between the binary search tree and all the other data structures, see the mini-graphs with the binary search tree clearly dwarfing the other data structures and performing in linear time. This is expected and needs no further discussion. (Note that for these graphs, the benchmark parameters were adjusted: the normal 180 million overall searches, insertions, and deletions would take unreasonably long and provide no noticeable benefit in terms of graph quality.)
+The worst-case scenarios for binary search trees are inserting ordered data, deleting the farthest leaf, and searching for the farthest leaf in the tree. In any of these cases, the worst-case performance is $O(n)$. Since treaps, skiplists, and red-black trees all claim to run in $O(\log n)$ expected time in these scenarios, these worst-case inputs are the next logical benchmarks. To briefly illustrate the performance difference between the binary search tree and all the other data structures, see the mini-graphs (Figure \ref{fig:worst_case} in which the binary search tree clearly runs in linear time. This is expected and needs no further discussion. (Note that the benchmark parameters for these graphs are scaled down.)
 
-\begin{figure}[h]
+\begin{figure}[h!]
     \centering
     \input{plots/worstCase_search.tex}
     \input{plots/worstCase_insert.tex}
     \input{plots/worstCase_delete.tex}
     \caption{Average of 100 operations, benchmarked every 500, starting at 500.}
+    \label{fig:worst_case}
 \end{figure}
 
-The more interesting graphs appear when the binary search tree is removed from the data set, as appears below. Here, same worst-case inputs for binary search trees create minor challenges for the various data structures, as they cope in their own ways with the ordered input data. By removing the binary search tree, the benchmarks can once again run at their full scales without issue, which already demonstrates their power to cope with difficult input sets.
+The more interesting graphs appear when the binary search tree is removed from the data set, as appears below. Here, same worst-case inputs for binary search trees create minor challenges for the various data structures, as they cope in their own ways with the ordered input data. By removing the binary search tree, the scale of the graphs' y-axes move from $10^{-3}$ to $10^{-5}$, which already demonstrates their shared advantage over the binary search tree.
 
 \input{plots/worstCaseNoBST_search.tex}
 
-The first graph, search, presents a great deal more noise than the randomized input search benchmarks. This, I attribute simply to the challenges and inefficiencies inherent in coping with sorted inputs to these data structures. The specifics are surprising and don't seem to have simple explanations. The two treaps perform almost identically, in contrast with the marked performance difference on search with randomized inputs. This suggests that ordered inputs to insert may cause the trees to develop more similar geometries than random inputs. PySkipList is by far the noisiest on search, which suggests a high degree of unpredictability in its performance, even as it maintains logarithmic complexity overall. Lastly, the red-black tree is consistent but slower than the rest. 
+The first graph, search, presents a great deal more noise than the randomized input search benchmarks. This, I attribute simply to the challenges and inefficiencies inherent in coping with sorted inputs in these data structures. The specifics are surprising and don't seem to have simple explanations. The two treaps perform almost identically, in contrast with the marked performance difference on search with randomized inputs. This suggests that ordered inputs to insert may cause the trees to develop more similar geometries than random inputs. PySkipList is by far the noisiest on search, which suggests a high degree of unpredictability in its performance, even as it maintains logarithmic complexity overall. Lastly, the red-black tree is consistent but much slower than the rest.
 
-The relative speeds of the three data structures remain unchanged: the treaps are fastest, the skiplist is significantly slower, and the red-black tree is slower still. While these are not provable general statements about the three data structures, they do provide insight into the impact of ordered inputs (to both insert and search) on the performance of searches, which is to say that the data structures are only very modestly affected. Finally, it is worth noting that, compared to search with randomized inputs, the red-black tree and Stromberg treap are both noticeably slower, whereas the Jenks treap and PySkipList remain about the same in their overall speeds.
+The relative speeds of the three data structures remain unchanged: the treaps are fastest, the skiplist is significantly slower, and the red-black tree is slower still. While these are not provable general statements about the three data structures, they do provide insight into the impact of ordered insertions on the performance of searches, which is to say that the data structures are only very modestly affected. Finally, it is worth noting that, compared to search with randomized inputs, the red-black tree and Stromberg treap are both noticeably slower, whereas the Jenks treap and PySkipList remain about the same in their overall speeds.
 
 \input{plots/worstCaseNoBST_insert.tex}
 
-Insert on ordered data presents a more interesting picture still. First, the red-black tree, whose performance on random data sat squarely between the two treaps, is now in last place by a wide margin. This makes sense: sorted input is a worst-case scenario for red-black trees, too, because they will need to rotate almost constantly to maintain balance. Yet, it remains clearly and visibly $O(\log n)$ even in this case---an impressive feat. Being deterministic, it exhibits very smooth worst-case performance, but it is indeed far slower than its randomized counterparts.
+Insertion of ordered data presents a more interesting picture still. First, the red-black tree, whose performance on random data sat squarely between the two treaps, is now in last place by a wide margin. This makes sense: sorted input is a worst-case scenario for red-black trees, too, because they will need to rotate almost constantly to maintain balance. Yet, it remains clearly and visibly $O(\log n)$ even in this case---an impressive feat. Being deterministic, it exhibits very smooth worst-case performance, but it is indeed far slower than its randomized counterparts.
 
-The remaining three data structures are plagued by differing levels of noise, but their relative performance is essentially unchanged compared to the randomized input insert benchmark. The most noteworthy aspect of their performance is perhaps the consistency of Jenks relative to Stromberg. While Stromberg straddles the line its randomized benchmark cut, with wide and erratic variations in running time, Jenks is quite consistent.
+The three randomized data structures exhibit differing levels of noise, but their relative performance is essentially unchanged compared to the randomized insert benchmark. The most noteworthy aspect of their performance is perhaps the consistency of Jenks relative to Stromberg. While presents wide and erratic variations in running time, its overall performance remains consistent with its performance on randomized inserts. Meanwhile, Jenks' treap remains quite consistent.
 
 \input{plots/worstCaseNoBST_delete.tex}
 
-Delete is much the same story: worst-case but very consistent performance for the red-black tree, while the randomized data structures have some noise but are still relatively consistent. Again, Jenks is much more stable than Stromberg in its running times.
+Delete is much the same story: worst-case but very consistent performance for the red-black tree, while the randomized data structures experience some noise but are still relatively consistent as well. Again, Jenks is much more stable than Stromberg in its running times.
 
-\section{Benchmark: Random Sequence of Operations}
+\section{Benchmark: Comparing to SortedList with Random Operations}
 
 In searching for data structure implementations in Python, I found a plethora of references to the Sorted Containers package and its SortedList class in particular. The advice seemed to be: if you need a sorted data structure, forget trees and use SortedList. It seems fitting, after investigating the performance of these well-known data structures relative to one another, to benchmark them all against the Python-specific data structure commonly used in practice. 
 
-The SortedList class leverages Python's very fast implementation of lists (for sizes up to 10,000) by storing a list of sorted sublists that can each be individually managed very quickly. To locate elements, SortedList performs a binary search on the lists' maxima and the performs a binary search on the appropriate list. It is also designed around the observation that "a lot of time has been spent optimizing mem-copy/mem-move-like operations both in hardware and software."\footnote{\url{http://www.grantjenks.com/docs/sortedcontainers/implementation.html}}
-
-This final benchmark is also structured somewhat differently than the rest in order to provide a different perspective on the data structures examined so far. For this benchmark, each data structure is subjected to the same, randomly generated sequence of search, insert, and delete operations. As before, no duplicates are inserted, no absent elements are searched for, and no absent elements are deleted. This benchmark does not aim to mimic a real-world workflow; it simply aims to put the data structures through their paces in a less static way and observe their performance under varied conditions.
+The SortedList class leverages Python's very fast implementation of lists (for sizes up to 10,000) by storing a list of sorted sublists that can each be individually managed very quickly. To locate elements, SortedList performs a binary search on the lists' maxima and then performs a second binary search on the appropriate sublist. SortedList is designed with modern hardware in mind: the creator, Grant Jenks, observes that "a lot of time has been spent optimizing mem-copy/mem-move-like operations both in hardware and software."\footnote{\url{http://www.grantjenks.com/docs/sortedcontainers/implementation.html}}
 
 \input{plots/mixedSID.tex}
 
-First, perhaps the most obvious result is that SortedList is tied for top performance in terms of running time across the board. What shocks me is that the naive binary search tree, which I wrote without any attempt to optimize it, runs just as fast under this randomized workload! (SortedList very likely has superior space complexity, and this is a considerable advantage in practice. It is beyond the scope of this paper, though.) 
+This final benchmark is structured somewhat differently than the rest. It aims to provide a different perspective on the data structures examined so far. For this benchmark, each data structure is subjected to the same, randomly generated sequence of search, insert, and delete operations. As before, no duplicates are inserted, no absent elements are searched for, and no absent elements are deleted. This benchmark does not aim to mimic a real-world workflow; it simply aims to put the data structures through their paces in a less static way and observe their performance under varied conditions.
 
-I have certainly and trivially verified binary search trees' vulnerability to worst-case input and, more interestingly, the relative ease with which all other tested data structures handle said input. For random data, however, the algorithmic simplicity of the binary search tree seems to beat out the treaps, skiplist, and red-black tree. Despite theoretically inferior time complexity on insert and delete, SortedList ties for lowest running time on mixed operations. This seems to vindicate Jenk's approach and illuminate the power in designing data structures to take advantage of modern hardware.
+First, perhaps the most obvious result is that SortedList is tied for top performance in terms of running time across the board. What shocks me is that the naive binary search tree, which I wrote without any attempt to optimize it, runs just as fast under this randomized workload! (SortedList very likely has superior space complexity, and this is a considerable advantage in practice. However, it is beyond the scope of this paper.)
 
-Looking back briefly at the random input benchmarks for search, insert, and delete, the only constants are that the treaps consistently perform well and PySkipList consistently runs substantially more slowly than the treaps. The red-black tree and binary search tree both vary in their rankings relative to the other data structures. The three graphs for single operations on ranodom inputs foreshadow some, but certainly not all, of the characteristics of this graph. Most clearly: the treaps again come in with respectable running times but sit squarely behind the fastest data structures. PySkipList and the red-black tree each suffer greatly on certain operations in prior benchmarks, so it is unsurprising to find that they are much slower than the treaps (and, since these data are randomized, the binary search tree). 
+One of CS 584's core messages is that algorithms with better asymptotic performance will generally beat any other optimizations by leaps and bounds. The worst-case benchmarks certainly and trivially verified binary search trees' vulnerability to $O(n)$ worst-case performance and, more interestingly, the relative ease with which all other tested data structures handle said input in $O(\log n)$ time. For random data, however, the algorithmic simplicity of the binary search tree seems to beat out the treaps, skiplist, and red-black tree. Meanwhile, despite inferior asymptotic complexity on insert and delete, SortedList ties for lowest running time on mixed operations. This seems to vindicate Jenks' approach and demonstrates the tremendous power of designing data structures to take advantage of modern hardware.
 
-In practice, SortedList does appear to be a highly competitive data structure. It undeniably bests all but the binary search tree in this test. Were I to continue testing, I would wish to investigate SortedList's worst-case performance, however. It will very likely suffer under one of the same worst-case input as binary search trees, reverse-sorted input data: it will presumably copy all the data in the target list on every insert. Unlike the binary search tree, however, SortedList is designed so that its worst-case behavior is highly optimized on modern hardware. My open question: how much will hardware optimization (SIMD instructions, caching, and so on) cushion SortedList's performance hit in this worst-case?
+Looking back briefly at the random input benchmarks for search, insert, and delete, the only constants are that the treaps consistently perform well and PySkipList consistently runs substantially more slowly than the treaps. The red-black tree and binary search tree both vary in their rankings relative to the other data structures. The three graphs for single operations on random inputs foreshadow some, but certainly not all, of the characteristics of this combined benchmark. Most clearly: the treaps again come in with respectable running times but sit squarely behind the fastest data structures. PySkipList and the red-black tree each suffer greatly on certain operations in prior benchmarks, so it is unsurprising to find that they are much slower than the treaps (and, since these data are randomized, the binary search tree). 
+
+In practice, SortedList does appear to be a highly competitive data structure. It undeniably bests all but the binary search tree in this test. Were I to continue testing, I would wish to investigate SortedList's worst-case performance, however. It will very likely suffer under one of the same worst-case inputs as binary search trees, reverse-sorted input data: it will presumably copy all the data in the target list on every insert. Unlike the binary search tree, however, SortedList is designed so that its worst-case behavior is highly optimized on modern hardware. My open question: how much will hardware optimization cushion SortedList's performance hit in this worst-case?
 
 \section{Concluding Remarks}
-The reality of how slow $O(n)$ can be compared to $O(\log n)$ hit me clearly during the worst-case benchmarking of the binary search tree. In CS 584, we consider any polynomial time algorithm to be feasibly runnable, but for these (admittedly very large) input sizes, even linear-time algorithms brought my very powerful workstation to a grinding halt with a single binary tree benchmark sequence that, under ideal circumstances, had taken about a minute to complete. In reflecting on this---which I had ample time to do during a two-hour, worst-case benchmark involving Python's beloved built-in lists---I recognized that by inserting $n$ items into data structures, I was effectively multiplying their theoretical complexity by $n$. This explains why the blazingly-fast $O(\log n)$ operations nonetheless took around a minute to complete. It further explains why going from $10^-5$ to $10^-3$ seconds for a given operation increased my overall benchmarking time by a factor of 30 or more - a frustrating reality I had to manage throughout my testing. In effect, my worst-case tests had time complexity $O(n^2)$ with $n = 1,000,000$.
+The reality of how slow $O(n)$ can be compared to $O(\log n)$ hit me clearly during the worst-case benchmarking of the binary search tree. In CS 584, we consider any polynomial time algorithm to be feasibly runnable, but for these admittedly very large input sizes, even linear-time algorithms brought my very powerful workstation to a grinding halt with a single binary search tree benchmark sequence that, under ideal circumstances, had taken about a minute to complete. In reflecting on this---which I had ample time to do during a two-hour, worst-case benchmark involving Python's beloved built-in lists---I recognized that by inserting $n$ items into these data structures, I was effectively multiplying the overall theoretical complexity of my benchmarks by $n$. This explains why the blazingly fast $O(\log n)$ operations nonetheless took around a minute to complete. It further explains why going from $10^{-5}$ to $10^{-3}$ seconds for a given operation increased my overall benchmarking time by a factor of 30 or more---a frustrating reality I had to manage throughout my testing. In effect, my worst-case tests had time complexity $O(n^2)$ with $n = 1,000,000$.
 
-I find all of the above results interesting for academic purposes and for certain applications. However, I can't ignore the 11 idle logical cores on my CPU during each of the benchmarks I ran! There is a place for single-threaded data structures, to be sure, but I would very much like to explore these same questions using data structures or methods that would allow me to more fully utilize the actual computational power of my hardware to more quickly solve the tasks at hand.
+I find all of the above results interesting for academic purposes and for certain applications. However, I can't ignore the 11 idle logical cores on my CPU during each of the benchmarks I ran! There is a place for single-threaded data structures, to be sure, but I would very much like to explore these same questions using data structures or methods that would allow me to more fully utilize the actual computational power of my hardware to more quickly complete the tasks at hand.
 
-It's worth noting that an implementation by Dmitry Sysoev of the textbook's red-black tree algorithm would have made for an even more interesting counterpoint: on insert, with random data, it had proved to be the fastest algorithm. Unfortunately, its deletion method was fatally flawed, partly due to design decisions by the textbook authors that made their algorithm very difficult to implement correctly. I was not able to fix the Sysoev implementation in the time available for this project, so I excluded it from the analysis instead. (My partially-fixed implementation is available in my repository as redblacktree.py in the data structures folder.)
+It's worth noting that an implementation by Dmitry Sysoev of the textbook's red-black tree algorithm would have made for an even more interesting counterpoint: on insert, with random data, it had proved to be the fastest algorithm. Unfortunately, its deletion method was fatally flawed, partly due to design decisions by the textbook authors that made their algorithm very difficult to implement correctly. I was not able to fix the Sysoev implementation in the time available for this project, so I excluded it from the analysis instead. My partially-fixed implementation is available in my repository as redblacktree.py in the data structures folder.
 
 \end{document}
